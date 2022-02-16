@@ -1,0 +1,130 @@
+{% load template_tags %}
+
+{% load static %}
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/sianno.css' %}" />
+ 
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/js/popper.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/open-iconic-bootstrap.css' %}">
+ 
+</head>
+<script type="text/javascript">
+  var width = "{{doc.width}}",
+    height =  "{{doc.height}}",
+    type = "{{doc.type}}",
+    scale = "{{doc.scale}}";
+    url = "/media/{{ doc.document.name }}";
+    document_id = "{{ doc.id }}";
+
+  // var this_page = "{{this_page}}";
+</script>
+{% if annotation == "rect" %}
+<script src="/static/js/d3.v4.min.js"></script>
+{% elif annotation == "poly" %}
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/d3-moveto" ></script>
+<script src="https://cdn.jsdelivr.net/d3js/3.5.9/d3.min.js"></script>
+{% endif %}
+<body style="background-color: black; color: white">
+ 
+  <nav class="navbar navbar-expand navbar-light bg-light">
+    <a class="navbar-brand" href="/sianno/">
+        <img src="{% static 'images/CSIRO_logo.png' %}" width="30" height="30" alt="">
+
+        CSIRO SIANNO (<b>S</b>imple <b>I</b>mage <b>ANNO</b>tation Tool)
+    </a>
+
+
+    <span  class="navbar-text">Image Review Progress: {{ completed_count }} of {{ total_count }} Image(s)</span>
+    
+    <span class="navbar-text"><progress value="{{ completed_count }}" max="{{ total_count }}"> </progress></span>
+    
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse " id="navbarNavDropdown">
+            <ul class="navbar-nav  ml-auto">
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Actions
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% if user|is_in_group:"coordinator" == True %}
+            <a class="dropdown-item" href="/sianno/data_export/">
+                <span class="oi oi-data-transfer-download"></span> CSV</a>
+
+            <button type="button" class="dropdown-item" id="btn_upload">
+                <span class="oi oi-cloud-upload"></span> Upload </button>
+            {% endif %}
+            <a class="dropdown-item" href="/accounts/logout/?next=/sianno/"> <span
+                    class="oi oi-account-logout"></span> Logout </a>
+        
+        </div>
+    </li>
+
+    </ul>
+    </div>
+
+</nav>
+
+
+<a class="btn btn-warning" href="/sianno/">
+  <span class="oi oi-arrow-circle-left"></span> Back
+</a>
+{% if annotation == "poly" %}
+<button class="btn btn-warning annotation_button" href="/sianno/" data-key-pressed-id = "1">
+  Draw Polygon
+</button>
+<button id="btn_delete_selected" class="btn btn-warning" href="/sianno/">
+<span class="oi oi-delete"></span> Delete Selected
+</button>
+{% endif %}
+{% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
+
+{% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
+<label>Accession Number: {{doc.accession_no}}</label>  
+<label>View Type: {{ doc.view_position}}</label>
+
+<div class="container-fluid" id="imageBody-WX">
+    
+</div>
+{% endif %}
+
+<br>
+
+<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 300px; color: black; padding:10px"> 
+  <form method="post" id="form-wrist-xray-grading" >
+    {% csrf_token %}
+    <input type="hidden" name="save_next_wrist_xray" value="yes">
+    <label class="btn btn-danger">
+      <input type="checkbox" name= "exclude_accession_number"/>
+        Exclude this Accession Number
+    </label>
+<label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
+    <button type="button" id="id_btn_save_next" class="btn btn-primary float-right">Save & Next</button>
+    </form>
+</div>
+
+<div class="container-fluid">
+      <div class="row">
+        {% include "modals/wrist_xray_modal.html" %}
+        
+      </div>
+</div>
+
+</body>
+
+{% if annotation == "rect" %}
+<script type="text/javascript" src="{% static 'js/wrist_annotation.js' %}"></script>
+{% elif annotation == "poly" %}
+<script type="text/javascript" src="{% static 'js/polygon_annotation.js' %}"></script>
+{% endif %}
+
+

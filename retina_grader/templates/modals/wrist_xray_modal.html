@@ -1,0 +1,157 @@
+{% load static %}
+<div class="modal right fade" id="wxModal" role="dialog">
+    <div class="modal-dialog modal-sm ">
+    
+      <!-- Modal content-->
+      <div class="modal-content" style="color:black">
+        <div class="modal-header">
+          <h4 class="modal-title">Wrist XRAY Info</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          
+        </div>
+        <div class="modal-body">
+<div class="container">
+          <div class="row">
+            <form class="col-sm-12">
+              <p>Bone</p>
+            <div class="form-row">
+              <div class="col-sm-12 mb-3">
+             <div class="btn-toolbar col-sm-12" role="toolbar" aria-label="Toolbar with button groups">
+              <div class="btn-group btn-group-toggle mr-2 flex-wrap" data-toggle="buttons" >
+                <label class="btn btn-primary" name="bone_number" id="__bone_MC1">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','MC1')"> MC1
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_MC2">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','MC2')"> MC2
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_MC3">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','MC3')"> MC3
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_MC4">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','MC4')"> MC4
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_MC5">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','MC5')"> MC5
+                </label>
+                <br>
+                <label class="btn btn-primary" name="bone_number" id="__bone_TR">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','TR')"> TR
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_TZ">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','TZ')"> TZ
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_CP">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','CP')"> CP
+                </label>
+    
+                <label class="btn btn-primary" name="bone_number" id="__bone_HM">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','HM')"> HM
+                </label>
+                <br>
+                <label class="btn btn-primary" name="bone_number" id="__bone_SC">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','SC')"> SC
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_LU">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','LU')"> LU
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_TQ">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','TQ')"> TQ
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_PI">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','PI')"> PI
+                </label>
+                <br>
+                <label class="btn btn-primary" name="bone_number" id="__bone_DR">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','DR')"> DR
+                </label>
+                <label class="btn btn-primary" name="bone_number" id="__bone_DU">
+                  <input type="radio"  autocomplete="off" onclick="btn_clicked('bone_number','DU')"> DU
+                </label>                               
+            </div>
+          </div>
+          </div>
+    
+         
+        </div>
+        <!-- end of form row -->
+        <p>Fracture on Current View</p>
+        <div class="form-row">
+          <div class="col-md-6 mb-3">
+         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons" >
+            <label class="btn btn-primary" name="fracture_on_current_view" id="__fracture_on_current_view_yes">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('fracture_on_current_view','Yes')"> Yes
+            </label>
+            <label class="btn btn-primary" name="fracture_on_current_view" id="__fracture_on_current_view_no">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('fracture_on_current_view','No')"> No
+            </label>
+          </div>
+      </div>
+      </div>
+    
+     
+    </div>
+    
+       <!-- end of form row -->
+       <p>Fracture on Other View</p>
+       <div class="form-row">
+         <div class="col-md-6 mb-3">
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+         <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons" >
+           <label class="btn btn-primary" name="fracture_on_other_view" id="__fracture_on_other_view_yes">
+             <input type="radio"  autocomplete="off" onclick="btn_clicked('fracture_on_other_view','Yes')"> Yes
+           </label>
+           <label class="btn btn-primary" name="fracture_on_other_view" id="__fracture_on_other_view_no">
+             <input type="radio"  autocomplete="off" onclick="btn_clicked('fracture_on_other_view','No')"> No
+           </label>
+         </div>
+     </div>
+     </div>
+    
+    
+    </div>
+        <!-- end of form row -->
+
+    <!--         
+        <p>View type</p>
+        <div class="form-row">
+          <div class="col-md-6 mb-3">
+         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons" >
+            <label class="btn btn-primary" name="view_type" id="__view_type_1">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','1')"> View 1
+            </label>
+            <label class="btn btn-primary" name="view_type" id="__view_type_2">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','2')"> View 2
+            </label>
+            <label class="btn btn-primary" name="view_type" id="__view_type_3">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','3')"> View 3
+            </label>
+            <label class="btn btn-primary" name="view_type" id="__view_type_4">
+              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','4')"> View 4
+            </label>
+          </div>
+      </div>
+      </div>
+    
+    </div>
+         -->
+        <!-- end of form row -->
+      
+        </form>
+          </div>
+        </div>
+      
+</div>
+        
+<div class="modal-footer">
+          
+
+  <button id = "id_btn_save_wrist_xray" type="button" class="btn btn-primary" >Save</button>
+
+</div>
+        </div>
+      
+      </div>
+      
+    </div>

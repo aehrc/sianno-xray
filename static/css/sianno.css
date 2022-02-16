@@ -1,0 +1,59 @@
+rect.active{
+	stroke: red;
+};
+
+rect{
+	stroke: black;
+}
+
+circle.active{
+    stroke: yellow;
+    fill: yellow;
+    /*stroke-opacity: 0.5; */
+}
+polygon.active{
+	stroke: greenyellow;
+	fill: greenyellow   ;
+}
+
+.button {
+	background-color: #4CAF50;
+}
+
+/* Modal Right */
+.modal-content
+{
+	position: fixed!important;
+    color: black!important;
+    right: 20px!important;
+    width: 450px!important;
+}
+
+.btn.tooth	
+{
+	padding: 0.2em!important;
+}
+
+.svg-container {
+	display: inline-block;
+	position: relative;
+	width: 100%;
+	padding-bottom: 100%; /* aspect ratio */
+	vertical-align: top;
+	overflow: hidden;
+  }
+  
+  .svg-content-responsive {
+	display: inline-block;
+	position: absolute;
+	top: 10px;
+	left: 0;
+  }
+	  
+  
+ .btn.btn-primary.active {
+	background-color: #e21833 !important;
+	border-color: #e21833 !important;
+	color: yellow !important;
+  }
+  
