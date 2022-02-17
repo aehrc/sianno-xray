@@ -28,13 +28,13 @@
 
 <br>
 
-*   Navigate to the simple_grader directory.  
+*   Navigate to the simple_grader directory (note - sianno-xray-main is the branch name and may differ).  
 
->`cd ~\<grader file path>\simple_grader`  
+>`cd ~\<grader file path>\sianno-xray-main`  
 
 *   Install required libraries using the following command, making sure that the VE is activated:
 > `pip install -r requirements.txt`
-* Any conflicts that arise from the release of new versions will rear themselves here - update the versions appropriately in requirements.txt to resolve them.
+* Any conflicts that arise from the release of new versions can rear themselves here - troublesome or conflicting versions can be updated appropriately in requirements.txt to resolve them.
 
 <br>
 
@@ -46,14 +46,11 @@
 * In `\simple_grader\simple_grader\` open the settings.py file.
 * Change the MEDIA_ROOT variable to the path where you want to store the wrist-fracture images and their annotation .JSON files.
 
-* Alternatively, create a new settings file, import all from settings.py (`from .settings import *`) and override the MEDIA_ROOT:
+* Alternatively, create a new settings file (or use the template settings_user.py), import all from settings.py (`from .settings import *`) and override the MEDIA_ROOT:
 
 >`1 from .settings import *`
 
->`2 MEDIA_ROOT = "/<media file path>/grader_images"`
-
- * Then, select the settings file required using the following command - being sure to omit the `.py` file extension from the settings filename.
- > `py manage.py runserver 8080 --settings simple_grader.<settings file name>` 
+>`2 MEDIA_ROOT = "/<media file path>/grader_images"` 
 
 * For more information on Django settings, see the [settings page](https://docs.djangoproject.com/en/4.0/topics/settings/ "Django Tutorial") of the Django Documentation.
 
@@ -64,12 +61,15 @@
 <br>
 
 * The simple grader is run using the Python web framework Django.
-* From the terminal, with the VE activated, run the simple_grader server using the following command:
+* From the IDE terminal - with the VE activated - run the simple_grader server using the following command:
 >`py manage.py runserver`
 * The terminal will output the port that the server is running on.  If the 8000 port (the default port) is in use, or you want to elect a different starting port, add the desired port to the runserver command:
 
 >`py manage.py runserver 8080`
-* For more information see the [Django Tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/ "Django Tutorial").
+
+* If a separate settings file is to be used, specify it like so; note that the command is in python sytax so the '.py' file extension will need to be ommitted from the settings filename:
+ > `py manage.py runserver 8080 --settings=simple_grader.<settings filename>` 
+* For more information see the [Django Tutorial](https://docs.djangoproject.com/en/4.0/topics/settings/ "Django Tutorial").
 
 * Navigate to the Sianno homepage by following the IP:Port address, followed by '/sianno'; for example, 127.0.0.1:8080/sianno
 
@@ -91,13 +91,13 @@
 The Sianno index page displays a draft list and a reviewed list.  All un-annotated images are listed under the Drafts heading; all annotated images are listed under the Reviewed section.  Images can be uploaded by accessing the Actions dropdown list in the top right corner.
 <br>
 
-Images can be annotated either using a Rectangular tool or a Polygon tool.  To change between the two, open `/simple_grader/retina_grader/views.py`.  Under the `def detail(request)` function, assign the `annotation` to either 'rect' or 'poly'.
+Once an image has been uploaded it will appear in the Draft list.  Select it to be redirected to the annotation page (sianno/detail). Images can be annotated either using a Rectangular tool or a Polygon tool.  To change between the two, open `/retina_grader/views.py`.  Under the `def detail(request)` function, assign the `annotation` to either 'rect' or 'poly' (remember to ctrl-s).
 <br>
 
-A couple of notes on the annotation tools:
-* Double-clicking on a rectangle or polygon will allow the user to add/change the text annotation. 
-* When drawing using the polygon annotation tool, hold shift and click to close the polygon. 
-* Click a polygon (or rectangle PENDING) to select it (it will be highlighted), and use the 'Delete Selected' button to remove it.
+Using the rectangle tool, click and drag to begin drawing.  Click again to set the rectangle.  The rectangle can be moved by clicking and dragging, and it can be resized by clicking and dragging on the circles on the top-left and bottom-right of the rectangle. Double-clicking on the rectangle will bring up a modal that allows bone number annotation.  
+<br>
+Using the polygon tool, click on the 'Draw Polygon' button to begin annotation. To close the polygon, hold shift and click.  To delete the polygon, select it (it will be highlighted when selected) and press 'Delete Selected'.  Double-click on the polygon to annotate the bone number from the modal menu.  
+
 
 ## 7. Using the Django Database
 
