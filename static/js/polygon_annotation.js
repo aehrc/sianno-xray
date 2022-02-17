@@ -150,7 +150,13 @@ function DrawPolygon(circle_points, polygon_points, fracture_info){
                         d3.select(this).select("polygon").classed("active", true);
                         d3.select(this).selectAll("circle").classed("active", true);
                     }                    
-                });
+                })
+	       .on("dblclick", function(d){
+		   var text_element = d3.select(this).select("text");
+		   console.log("Bone number: " + text_element.attr("bone_number"));
+		   open_modal(text_element)
+	       });
+
     g.append("polygon")
      .attr("points", polygon_points)
      .style("fill", "blue")
