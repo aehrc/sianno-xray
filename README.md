@@ -96,7 +96,7 @@ Once an image has been uploaded it will appear in the Draft list.  Select it to 
 
 Using the rectangle tool, click and drag to begin drawing.  Click again to set the rectangle.  The rectangle can be moved by clicking and dragging, and it can be resized by clicking and dragging on the circles on the top-left and bottom-right of the rectangle. Double-clicking on the rectangle will bring up a modal that allows bone number annotation.  
 <br>
-Using the polygon tool, click on the 'Draw Polygon' button to begin annotation. To close the polygon, hold shift and click.  To delete the polygon, select it (it will be highlighted when selected) and press 'Delete Selected'.  Double-click on the polygon to annotate the bone number from the modal menu.  
+Using the polygon tool, click on the 'Draw Polygon' button to begin annotation. To close the polygon, hold shift and click.  To delete the polygon, select it (it will be highlighted when selected) and press the 'Delete Selected' button.  Double-click on the polygon to annotate the bone number from the modal menu.  
 
 
 ## 7. Using the Django Database
