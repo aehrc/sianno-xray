@@ -168,7 +168,7 @@ function redraw_new_rect(){
 			d3.select(this).remove();
 		}else{
 			global_data.push({"x": x, "y": y, "width": width, "height": height,
-			 
+       "bone_number":"unknown",		 
        "fracture_on_current_view":"unknown",
        "fracture_on_other_view":"unknown",
        "view_type":"unknown",
