@@ -16,7 +16,8 @@
 * It may take a minute.
 * To activate the environment, navigate into the VE's parent folder and run the following:
 
-> `\<your_VE_name>\Scripts\activate`
+> `cd <your_VE_name>`
+> `Scripts\activate`
 
 * You can deactivate the VE at anytime by running the command:
 
