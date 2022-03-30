@@ -1,15 +1,44 @@
+import sys
 from .models import Document, Grading, GradingField, Point, Polygon, Rectangle
 import json
 from django.conf import settings
 from django.contrib.auth.models import User
 import os
-
 from PIL import Image
 import numpy as np
 from pydicom import dcmread
 import io
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
+import shutil
+import time
+import subprocess as sp #for boilerplate code
+
+
+#boilerplate code to get the image tested and return the result
+def get_frcnn_annotation(doc):
+	
+	print(doc.document.name) #returns 'document_tray/Superuser/filename
+	path_to_save = settings.MEDIA_ROOT + "/test_image"
+	#create temp dir if required
+	if not os.path.exists(path_to_save):
+		os.makedirs(path_to_save)
+	#copy file from document.path to test image folder using shutil
+	shutil.copy(doc.document.path, path_to_save)
+	
+	
+	# event loop should run until the bat file has completed
+	run_bat("./", "test.bat")	
+	
+	
+	#return False
+
+
+def run_bat(filepath, filename):
+	p = sp.Popen(filename, cwd=filepath, shell=True)
+	out, err = p.communicate()
+	
+	
 
 #Utils contains functions that don't belong in views, ie: don't return a HTTP Response
 

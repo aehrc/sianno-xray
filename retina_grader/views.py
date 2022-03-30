@@ -16,10 +16,11 @@ import random
 import string
 import csv
 import json
+import asyncio
 
 import os
 
-from .utils import save_polygon_info, save_rect_info, write_docs, read_dcm_file, write_polygon_docs
+from .utils import get_frcnn_annotation, save_polygon_info, save_rect_info, write_docs, read_dcm_file, write_polygon_docs
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -66,13 +67,27 @@ def document_pre_save(sender, instance, *args, **kwargs):
 @login_required
 @csrf_exempt
 def detail(request):
-	annotation = "poly" #use "poly" or "rect" to load the respective annotation tool
+	annotation = "rect" #use "poly" or "rect" to load the respective annotation tool
 
 	#view used for rectangle annotation
 	if annotation == "rect":
 		try:
 			document_id = request.GET["d"]
 			doc = Document.objects.get(id=document_id)
+			#BOILERPLATE
+			if doc.purpose == "ASSESSING":
+				'''try:
+					loop = asyncio.get_event_loop()
+				except RuntimeError as ex:
+					if "There is no current event loop in thread" in str(ex):
+						loop = asyncio.new_event_loop()
+						loop.run_until_complete(get_frcnn_annotation(doc))
+						loop.close()'''
+				get_frcnn_annotation(doc)
+				response = False
+				if response == False:
+					return HttpResponseRedirect("/sianno/" )
+			#END BOILERPLATE
 			write_docs(doc)
 			total_count = Document.objects.filter(allocated_to = request.user).count()
 			completed_count = Document.objects.filter(status="Reviewed", allocated_to=request.user).count()
@@ -115,6 +130,7 @@ def detail(request):
 						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 					#as "EXCLUDE" and save the record and then load the next record.
 				for p in request.POST:
+					print(f"this is p {p}")
 					if p.startswith("grading_"):
 						g = Grading.objects.get(id = p.split("grading_")[1])
 						g.value = request.POST[p]
@@ -289,11 +305,12 @@ def data_export(request):
 		return HttpResponse(str(ex))
 
 @login_required
-def new_files(request):
+def new_files(request):	
 	if request.user.groups.filter(name__in=["coordinator"]).exists() : 
+		print(request.method)
 		if request.method == "GET":
 			users = User.objects.all()
-			purposes = ["GRADING"] #"SCREENING",
+			purposes = ["GRADING","ASSESSING"] #"SCREENING",
 			image_types = ["WRIST-XRAY"] #"BITEWING", "PANAROMIC", "RETINA", "OTHER",
 
 			return render(request,"modals/new_files_modal.html", {"users": users, "purposes": purposes, "image_types": image_types})

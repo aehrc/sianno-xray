@@ -26,7 +26,7 @@ DOCUMENT_TYPES = (('BITEWING','BITEWING'),
 #PURPOSE TYPES
 PURPOSE_TYPES = (('SCREENING','SCREENING'),
 				 ('GRADING','GRADING'),
-				
+				 ('ASSESSING','ASSESSING') #BOILERPLATE
 					)
 #UI types
 UI_CONTROL_TYPES = (('Label','Label'),
@@ -102,7 +102,9 @@ VALUE_SET_CHOICES = (
 )
 
 #store the image under user's name
+#no idea how this works without putting parameters in but here we go
 def get_file_location_path(instance, filename):
+	#print(dir(instance))	
 	print("FILE LOCATION: " + 'document_tray/{0}/{1}'.format(instance.allocated_to.username, filename))	
 	return 'document_tray/{0}/{1}'.format(instance.allocated_to.username, filename)
 

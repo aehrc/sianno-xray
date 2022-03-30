@@ -86,11 +86,12 @@
 <span class="oi oi-delete"></span> Delete Selected
 </button>
 {% endif %}
-{% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
+{% if doc.type == "WRIST-XRAY" and doc.purpose == "GRADING" or doc.purpose == "ASSESSING" %} <!-- precedence rules at work here -->
+  
 
-{% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
-<label>Accession Number: {{doc.accession_no}}</label>  
-<label>View Type: {{ doc.view_position}}</label>
+  {% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
+  <label>Accession Number: {{doc.accession_no}}</label>  
+  <label>View Type: {{ doc.view_position}}</label>
 
 <div class="container-fluid" id="imageBody-WX">
     
