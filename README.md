@@ -109,9 +109,15 @@ All Polygon, Rectangle, Point, and Grading objects are linked by foreign key wit
 
 * Start the python shell from the program terminal:  `py manage.py shell`
 * Import models:   `from retina_grader.models import *`
-* Select all documents: `Documents.objects.all()`
-* Delete all documents: `Documents.objects.all().delete()`
+* Select all documents: `Document.objects.all()`
+* Delete all documents: `Document.objects.all().delete()`
 
 It's a good idea to also manually delete documents and .json files from your media folder.
 
- 
+# FRCNN Integration Branch
+
+Use this branch for development of the FRCNN integration. Work done so far:
+
+* Added a new Purpose attribute to the Wrist Fracture Document object (found in models): Assessing.
+* When 'Upload' is selected from the 'Actions' dropdown menu, the image 'Assessing' purpose can now be selected.
+* The uploaded file will appear on the 'Drafts' list with purpose listed as 'Assessing'.  Normally when the file is clicking on in the drafts list the `def detail` view will save the image locally with `write_docs(doc)` and then redirect to the `sianno/detail/?d=...` page where it can be annotated. 
