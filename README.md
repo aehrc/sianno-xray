@@ -111,8 +111,8 @@ All Polygon, Rectangle, Point, and Grading objects are linked by foreign key wit
 
 * Start the python shell from the program terminal:  `py manage.py shell`
 * Import models:   `from retina_grader.models import *`
-* Select all documents: `Documents.objects.all()`
-* Delete all documents: `Documents.objects.all().delete()`
+* Select all documents: `Document.objects.all()`
+* Delete all documents: `Document.objects.all().delete()`
 
 It's a good idea to also manually delete documents and .json files from your media folder.
 
