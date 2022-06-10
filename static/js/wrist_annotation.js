@@ -18,6 +18,9 @@ var MIN_RECT_HEIGHT = 10;
 //d3.json fetches the rectangles for that document id that are stored as /rect.json'. 
 //Update then puts the rectangles onto the image
 var global_data = []
+
+//colordental ai result
+var color_dental_ai_result = "?";
 d3.json('/media/' + document_id + '/rect.json', function(error, data){
 	data.forEach(function(rect){
 		global_data.push(rect);
@@ -146,10 +149,36 @@ function mouseup() {
   console.log("mouseup");
 	// event.stopPropagation();
 	g_wrist.on("mousemove", null);
-	redraw_new_rect();	
+
+
+    //if its a color dental ai type
+    if(type == "COLOR_DENTAL"){
+      //first get the x, y coordinates of the new rectangle. 
+
+      g_wrist.selectAll("rect.new").each(function(d){
+        x1 = parseFloat(d3.select(this).attr("x"));
+        y1 = parseFloat(d3.select(this).attr("y"));
+        x2 = x1 + parseFloat(d3.select(this).attr("width"));
+        y2 = y1 + parseFloat(d3.select(this).attr("height"));
+      dental_ai_inference_call (x1, y1, x2, y2);
+
+      });
+    
+    }
+    else
+    {
+      redraw_new_rect();
+
+    }
+
+
+  	
 }
 
 function redraw_new_rect(){
+
+
+
 
   console.log("redraw_new_rect");
   d3.selectAll(".active").classed("active", false);
@@ -167,8 +196,15 @@ function redraw_new_rect(){
 		if(width < 10 || height < 10){
 			d3.select(this).remove();
 		}else{
-			global_data.push({"x": x, "y": y, "width": width, "height": height,
-       "bone_number":"unknown",		 
+
+      var bone_number = "unknown"
+      if(type == "COLOR_DENTAL"){
+        bone_number = color_dental_ai_result + "% Decay";
+
+      }
+
+      global_data.push({"x": x, "y": y, "width": width, "height": height,
+       "bone_number":bone_number,		 
        "fracture_on_current_view":"unknown",
        "fracture_on_other_view":"unknown",
        "view_type":"unknown",
@@ -378,7 +414,9 @@ function update(){
         .attr("bone_number", d.bone_number)
         .attr("fracture_on_current_view", d.fracture_on_current_view)
         .attr("fracture_on_other_view", d.fracture_on_other_view)
-        .attr("view_type", d.view_type)        
+        .attr("view_type", d.view_type)
+       
+
       });
 
       var allRects = newRects.merge(rects);
@@ -415,7 +453,8 @@ function update(){
         // return 200;
         console.log(JSON.stringify(d))
         try{
-          return x(d.x);
+          // return d.x;
+          return 0;
         }
         catch(error){
           console.log("An error occured: " + error)
@@ -423,7 +462,8 @@ function update(){
       })
       .attr("y", function (d) {
         try{
-          return y(d.y);
+          // return d.y;
+          return 0;
         }
         catch(error){
           console.log("An error occurred" + error)
@@ -515,6 +555,49 @@ function update_info(do_reload, modal_id){
     });
 };
 
+
+//get dental ai inference 
+function dental_ai_inference_call(x1,y1,x2,y2){
+
+
+	var json_dict = {
+		"dental_ai_infer": true,
+    "dental_ai_infer_x1": x1,
+    "dental_ai_infer_x2": x2,
+    "dental_ai_infer_y1": y1,
+    "dental_ai_infer_y2": y2
+
+		
+	};
+
+	 $.ajax({
+        type: "POST",
+        url: "/sianno/detail/?d=" + document_id,
+        data : json_dict,
+        // contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+          if (data.result == "OK")
+          {
+            // alert("success in calling inference module");
+            console.log("success in dental ai : " + data.output );
+            color_dental_ai_result = data.output;
+            redraw_new_rect();
+                  
+          }
+        },
+        
+        error: function(  req, textStatus, errorThrown){
+          alert("Update rectangles failed" + errorThrown);
+            // console.log("why it is failing?");
+            //  window.location.reload(true);
+            //console.log(JSON.stringify(error));
+        }
+    });
+};
+
+
+
 function open_modal(id){
 	//double-click on rectangle
 	console.log("double clicked, open wrist fracture modal");
@@ -542,6 +625,9 @@ function open_modal(id){
 
 		$("#wxModal").modal();
   }
+
+
+  
 };
 
 

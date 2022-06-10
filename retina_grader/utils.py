@@ -1,5 +1,7 @@
 import sys
-from .models import Document, Grading, GradingField, Point, Polygon, Rectangle
+
+from pandas import ExcelWriter
+from .models import Document, Grading, GradingField, GradingType, Point, Polygon, Rectangle
 import json
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,7 +15,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import shutil
 import time
 import subprocess as sp #for boilerplate code
-
+import datetime
 
 #boilerplate code to get the image tested and return the result
 def get_frcnn_annotation(doc):
@@ -40,7 +42,70 @@ def run_bat(filepath, filename):
 	
 	
 
+
+#runs the deep learning inferring module on a specific image. 
+#Author for this function: Maryam.Mehdizadeh@csiro.au 
+
+if settings.DENTAL_AI_INFER_MODULE_ENABLED : 
+# loading the model and weights
+	from keras.applications.inception_v3 import InceptionV3
+	from keras.applications.inception_v3 import preprocess_input
+	from keras.models import Model
+	from keras.layers import Dense, GlobalAveragePooling2D
+	from keras.layers import Dropout
+	from PIL import Image
+	import numpy as np
+	import tensorflow as tf
+
+	base_model = InceptionV3(weights='imagenet',include_top=False)
+	x = base_model.output
+	x = GlobalAveragePooling2D()(x)
+	x = Dense(1024, activation='relu')(x)
+	x = Dropout(0.5)(x)
+	predictions = Dense(1, activation='sigmoid')(x) 
+	model = Model(input=base_model.input, output=predictions)
+	model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=['accuracy'])
+	model.load_weights(settings.DENTAL_AI_INFER_MODULE_WEIGHTS_FOLDER + '/weights00000100.h5') # load the weights of your best trained model
+	keys = ["image_name", "prediction", "outcome"]
+	graph = tf.get_default_graph()#Change required to allow django dev server to run the code
+
+def dental_ai_infer_module_process_image(image_file_name_with_path):
+	
+	global graph#Change required to allow django dev server to run the code
+	with graph.as_default():#Change required to allow django dev server to run the code
+
+		print("Opening the image for dental AI infer")
+		image = Image.open(image_file_name_with_path)
+		image = image.resize((128,128)) # resize the image as per your trained model
+		im = np.asarray(image)
+		im=np.expand_dims(im,axis=0)
+		im = im.astype('float')
+		print("About to preprocess")
+		im=preprocess_input(im)
+		print("About to predict")
+
+		prdct=model.predict(im)
+		print("Prediction finished")
+
+		return prdct[0,0] # <0.5 is caries otherwise healthy
+
+def dental_ai_infer_module_crop_image(image_path, x1,x2,y1,y2):
+	try:
+		img_orginal = Image.open(image_path)
+		img_cropped = img_orginal.crop((x1,y1,x2,y2))
+		filename = settings.DENTAL_AI_INFER_MODULE_SAVED_IMAGE_FOLDER + datetime.datetime.now().strftime("/cropped-%d-%m-%y-%H-%M-%S.jpg")
+		img_cropped.save(filename)
+		return filename
+	except Exception as ex:
+		raise ex
+
+
+
+	
+
 #Utils contains functions that don't belong in views, ie: don't return a HTTP Response
+
+
 
 def save_rect_info(doc, rect_info, scale):
 	print("---------")

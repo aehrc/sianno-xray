@@ -19,6 +19,7 @@ GRADING_STATUS_CHOICES = (
 #DOCUMENT TYPES
 DOCUMENT_TYPES = (('BITEWING','BITEWING'),
 				 ('PANAROMIC','PANAROMIC'),
+				 ('COLOR_DENTAL','COLOR_DENTAL'),
 				
 					)
 
@@ -258,3 +259,10 @@ class GradingValueSet(models.Model):
 class GlobalSettings(models.Model):
 	key =  models.CharField(max_length = 100)
 	value = models.CharField(max_length=500)
+
+class UserPermission(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+	dental_ai_infer_module = models.BooleanField(default=False) #Color Dental AI inference module
+
+	def __str__(self) -> str:
+		return self.user.username + ", DentalAI Infer Module: " + str(self.dental_ai_infer_module)

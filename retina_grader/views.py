@@ -20,7 +20,7 @@ import asyncio
 
 import os
 
-from .utils import get_frcnn_annotation, save_polygon_info, save_rect_info, write_docs, read_dcm_file, write_polygon_docs
+from .utils import get_frcnn_annotation, save_polygon_info, save_rect_info, write_docs, read_dcm_file, write_polygon_docs, dental_ai_infer_module_crop_image, dental_ai_infer_module_process_image
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -74,20 +74,7 @@ def detail(request):
 		try:
 			document_id = request.GET["d"]
 			doc = Document.objects.get(id=document_id)
-			#BOILERPLATE
-			if doc.purpose == "ASSESSING":
-				'''try:
-					loop = asyncio.get_event_loop()
-				except RuntimeError as ex:
-					if "There is no current event loop in thread" in str(ex):
-						loop = asyncio.new_event_loop()
-						loop.run_until_complete(get_frcnn_annotation(doc))
-						loop.close()'''
-				get_frcnn_annotation(doc)
-				response = False
-				if response == False:
-					return HttpResponseRedirect("/sianno/" )
-			#END BOILERPLATE
+			
 			write_docs(doc)
 			total_count = Document.objects.filter(allocated_to = request.user).count()
 			completed_count = Document.objects.filter(status="Reviewed", allocated_to=request.user).count()
@@ -102,6 +89,20 @@ def detail(request):
 					"total_count" : total_count,
 					"annotation" : annotation})
 			elif request.method == "POST":
+				#BOILERPLATE
+				# if doc.purpose == "ASSESSING":
+				# 	'''try:
+				# 		loop = asyncio.get_event_loop()
+				# 	except RuntimeError as ex:
+				# 		if "There is no current event loop in thread" in str(ex):
+				# 			loop = asyncio.new_event_loop()
+				# 			loop.run_until_complete(get_frcnn_annotation(doc))
+				# 			loop.close()'''
+				# 	get_frcnn_annotation(doc)
+				# 	response = False
+				# 	if response == False:
+				# 		return HttpResponseRedirect("/sianno/" )
+			#END BOILERPLATE
 				print("Post request: ", request.POST)
 				if "wrist_xray" in request.POST:
 					print("updating wrist xray info")
@@ -129,6 +130,23 @@ def detail(request):
 							return HttpResponseRedirect("/sianno/" )
 						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 					#as "EXCLUDE" and save the record and then load the next record.
+				#if dental AI infer module request, then run the AI and display the output to the UI
+				if "dental_ai_infer" in request.POST:
+					x1 = request.POST["dental_ai_infer_x1"]
+					x2 = request.POST["dental_ai_infer_x2"]
+
+					y1 = request.POST["dental_ai_infer_y1"]
+					y2 = request.POST["dental_ai_infer_y2"]
+					print("In Dental AI INFER")
+					cropped_image_path = dental_ai_infer_module_crop_image(doc.document.path,round(float(x1)),round(float(x2)),round(float(y1)),round(float(y2)))
+					print("CROPPED PATH: " + cropped_image_path)
+					dental_ai_infer_output = dental_ai_infer_module_process_image(cropped_image_path)
+					print("AI Output: " + str(dental_ai_infer_output))
+					return JsonResponse({"result": "OK",
+						"output": str(round((1-dental_ai_infer_output)*100,2))})
+
+
+
 				for p in request.POST:
 					print(f"this is p {p}")
 					if p.startswith("grading_"):
@@ -144,6 +162,7 @@ def detail(request):
 					return HttpResponseRedirect("/sianno/" )
 				return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 		except Exception as ex:
+			print(str(ex))
 			return HttpResponse(str(ex))
 
 	#polygon annotation and saving methods		

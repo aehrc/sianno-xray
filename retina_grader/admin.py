@@ -1,6 +1,6 @@
 from django.contrib import admin
 # Register your models here.
-from .models import Grading, GradingType, GradingValueSet, GradingField, Document, GlobalSettings, Rectangle
+from .models import Grading, GradingType, GradingValueSet, GradingField, Document, GlobalSettings, Rectangle, UserPermission
 
 class DocumentAdmin(admin.ModelAdmin):
 	#readonly_fields = ['random_id']
@@ -16,3 +16,4 @@ admin.site.register(Document, DocumentAdmin)
 
 admin.site.register(GlobalSettings)
 admin.site.register(Rectangle)
+admin.site.register(UserPermission)
