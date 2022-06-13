@@ -16,7 +16,9 @@
 * It may take a minute.
 * To activate the environment, navigate into the VE's parent folder and run the following:
 
-> `\<your_VE_name>\Scripts\activate`
+> `cd <your_VE_name>`
+
+> `Scripts\activate`
 
 * You can deactivate the VE at anytime by running the command:
 
@@ -28,9 +30,9 @@
 
 <br>
 
-*   Navigate to the simple_grader directory (note - sianno-xray-main is the branch name and may differ).  
+*   Navigate to the simple_grader directory (note - sianno-xray is the branch name and may differ).  
 
->`cd ~\<grader file path>\sianno-xray-main`  
+>`cd ~\<grader file path>\sianno-xray`  
 
 *   Install required libraries using the following command, making sure that the VE is activated:
 > `pip install -r requirements.txt`
