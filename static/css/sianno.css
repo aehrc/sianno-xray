@@ -2,6 +2,22 @@ rect.active{
 	stroke: red;
 };
 
+rect.ost{
+	stroke: blue;
+};
+
+rect.lisf{
+	stroke: green;
+};
+
+rect.rockb{
+	stroke: grey;
+};
+
+rect.skinu{
+	stroke: turquoise;
+};
+
 rect{
 	stroke: black;
 }

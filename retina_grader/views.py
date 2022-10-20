@@ -19,7 +19,7 @@ import json
 
 import os
 
-from .utils import save_polygon_info, save_rect_info, write_docs, read_dcm_file, write_polygon_docs
+from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -66,7 +66,7 @@ def document_pre_save(sender, instance, *args, **kwargs):
 @login_required
 @csrf_exempt
 def detail(request):
-	annotation = "poly" #use "poly" or "rect" to load the respective annotation tool
+	annotation = "rect-foot" #use "poly" or "rect" to load the respective annotation tool
 
 	#view used for rectangle annotation
 	if annotation == "rect":
@@ -88,16 +88,16 @@ def detail(request):
 					"annotation" : annotation})
 			elif request.method == "POST":
 				print("Post request: ", request.POST)
-				if "wrist_xray" in request.POST:
-					print("updating wrist xray info")
-					wrist_xray_rects = json.loads(request.POST['wrist_xray_rects'])
+				if "foot_xray" in request.POST:
+					print("updating foot xray info")
+					foot_xray_rects = json.loads(request.POST['foot_xray_rects'])
 					scale = json.loads(request.POST['scale'])
 					print("--------------------")
-					print(wrist_xray_rects)
+					print(foot_xray_rects)
 					print("---------SCALE IS-----------")
 					print(scale)
 					print("--------------------")
-					save_rect_info(doc, wrist_xray_rects, scale)
+					save_foot_rect_info(doc, foot_xray_rects, scale)
 					return JsonResponse({"result" : "OK"})
 
 				if "save_next_wrist_xray" in request.POST:
@@ -115,6 +115,98 @@ def detail(request):
 						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 					#as "EXCLUDE" and save the record and then load the next record.
 				for p in request.POST:
+					if p.startswith("grading_"):
+						g = Grading.objects.get(id = p.split("grading_")[1])
+						g.value = request.POST[p]
+						g.save()
+						#get the next record..
+				doc.status = "Reviewed"
+				doc.save()
+				#get the next document in draft
+				d = Document.objects.filter(status="Draft", allocated_to=request.user).first()
+				if d == None:
+					return HttpResponseRedirect("/sianno/" )
+				return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
+		except Exception as ex:
+			return HttpResponse(str(ex))
+	elif annotation == "rect-foot":
+		try:
+			document_id = request.GET["d"]
+			doc = Document.objects.get(id=document_id)
+			write_docs(doc)
+			total_count = Document.objects.filter(allocated_to = request.user).count()
+			completed_count = Document.objects.filter(status="Reviewed", allocated_to=request.user).count()
+
+			if request.method == "GET":
+				print("GET Request: ", request.GET)
+				if doc == None:
+					return HttpResponse("Record Cannot be opened or you are not authorised")
+				return render(request, "detail.html", {
+					"doc": doc,
+					"completed_count" : completed_count,
+					"total_count" : total_count,
+					"annotation" : annotation})
+			elif request.method == "POST":
+				print("AM I HERE???????????")
+				print("Post request: ", request.POST)
+				print("AM I HERE???????????")
+				if "wrist_xray" in request.POST:
+					print("updating wrist xray info")
+					wrist_xray_rects = json.loads(request.POST['wrist_xray_rects'])
+					scale = json.loads(request.POST['scale'])
+					print("--------------------")
+					print(wrist_xray_rects)
+					print("---------SCALE IS-----------")
+					print(scale)
+					print("--------------------")
+					save_rect_info(doc, wrist_xray_rects, scale)
+					return JsonResponse({"result" : "OK"})
+				
+				if "foot_xray" in request.POST:
+					print("updating foot xray info")
+					foot_xray_rects = json.loads(request.POST['foot_xray_rects'])
+					scale = json.loads(request.POST['scale'])
+					print("--------------------")
+					print(foot_xray_rects)
+					print("---------SCALE IS-----------")
+					print(scale)
+					print("--------------------")
+					save_foot_rect_info(doc, foot_xray_rects, scale)
+					return JsonResponse({"result" : "OK"})
+				if "save_next_foot_xray" in request.POST:
+					#get exclude value from the form.
+					print("JUST CHECKING THE POST HERE_______________________")
+					print(request.POST)
+					print("Save next foot xray")
+					#if exclude is true then we get all records with the same accession number and set the status 
+					if "exclude_accession_number" in request.POST and request.POST["exclude_accession_number"] == "on":
+						docs = Document.objects.filter(accession_no = doc.accession_no)
+						docs.update(status="EXCLUDED")
+
+						#get the next document in draft
+						d = Document.objects.filter(status="Draft", allocated_to=request.user).first()
+						if d == None:
+							return HttpResponseRedirect("/sianno/" )
+						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
+					#as "EXCLUDE" and save the record and then load the next record.
+				if "save_next_wrist_xray" in request.POST:
+					#get exclude value from the form.
+					print("JUST CHECKING THE POST HERE_______________________")
+					print(request.POST)
+					print("Save next wrist xray")
+					#if exclude is true then we get all records with the same accession number and set the status 
+					if "exclude_accession_number" in request.POST and request.POST["exclude_accession_number"] == "on":
+						docs = Document.objects.filter(accession_no = doc.accession_no)
+						docs.update(status="EXCLUDED")
+
+						#get the next document in draft
+						d = Document.objects.filter(status="Draft", allocated_to=request.user).first()
+						if d == None:
+							return HttpResponseRedirect("/sianno/" )
+						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
+					#as "EXCLUDE" and save the record and then load the next record.
+				for p in request.POST:
+					
 					if p.startswith("grading_"):
 						g = Grading.objects.get(id = p.split("grading_")[1])
 						g.value = request.POST[p]
@@ -294,7 +386,7 @@ def new_files(request):
 		if request.method == "GET":
 			users = User.objects.all()
 			purposes = ["GRADING"] #"SCREENING",
-			image_types = ["WRIST-XRAY"] #"BITEWING", "PANAROMIC", "RETINA", "OTHER",
+			image_types = ["WRIST-XRAY", "FOOT-XRAY"] #"BITEWING", "PANAROMIC", "RETINA", "OTHER",
 
 			return render(request,"modals/new_files_modal.html", {"users": users, "purposes": purposes, "image_types": image_types})
 		elif request.method == "POST":

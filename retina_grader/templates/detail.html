@@ -21,7 +21,7 @@
 
   // var this_page = "{{this_page}}";
 </script>
-{% if annotation == "rect" %}
+{% if annotation == "rect-foot" %}
 <script src="/static/js/d3.v4.min.js"></script>
 {% elif annotation == "poly" %}
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -86,6 +86,24 @@
 <span class="oi oi-delete"></span> Delete Selected
 </button>
 {% endif %}
+<!-- {% if annotation == "rect-foot" %}
+<button class="btn btn-primary annotation_button" href="/sianno/" data-key-pressed-id = "1">
+  Draw Osteomyelitis
+</button>
+<button class="btn btn-success annotation_button" href="/sianno/" data-key-pressed-id = "2">
+  Draw Lis Franc
+</button>
+<button class="btn btn-secondary annotation_button" href="/sianno/" data-key-pressed-id = "3">
+  Draw Rocker bottom foot
+</button>
+<button class="btn btn-info annotation_button" href="/sianno/" data-key-pressed-id = "4">
+  Draw Skin ulcer
+</button>
+<button id="btn_delete_selected" class="btn btn-danger" href="/sianno/">
+<span class="oi oi-delete"></span> Delete Selected
+</button>
+{% endif %} -->
+
 {% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
 
 {% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
@@ -97,8 +115,20 @@
 </div>
 {% endif %}
 
+{% if doc.purpose == "GRADING" and doc.type == "FOOT-XRAY" %}
+
+{% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
+<!-- <label>Accession Number: {{doc.accession_no}}</label>  
+<label>View Type: {{ doc.view_position}}</label> -->
+
+<div class="container-fluid" id="imageBody-FX">
+    
+</div>
+{% endif %}
+
 <br>
 
+{% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
 <div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 300px; color: black; padding:10px"> 
   <form method="post" id="form-wrist-xray-grading" >
     {% csrf_token %}
@@ -112,9 +142,28 @@
     </form>
 </div>
 
+{% endif %}
+
+{% if doc.purpose == "GRADING" and doc.type == "FOOT-XRAY" %}
+<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 300px; color: black; padding:10px"> 
+  <form method="post" id="form-next-foot-grading" >
+    {% csrf_token %}
+    <input type="hidden" name="save_next_foot_xray" value="yes">
+    <label class="btn btn-danger">
+      <input type="checkbox" name= "exclude_accession_number"/>
+        Exclude this Accession Number
+    </label>
+<label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
+    <button type="button" id="id_btn_save_next_foot" class="btn btn-primary float-right">Save & Next</button>
+    </form>
+</div>
+
+{% endif %}
+
 <div class="container-fluid">
       <div class="row">
         {% include "modals/wrist_xray_modal.html" %}
+        {% include "modals/foot_xray_modal.html" %}
         
       </div>
 </div>
@@ -123,6 +172,8 @@
 
 {% if annotation == "rect" %}
 <script type="text/javascript" src="{% static 'js/wrist_annotation.js' %}"></script>
+{% elif annotation == "rect-foot" %}
+<script type="text/javascript" src="{% static 'js/foot_annotation.js' %}"></script>
 {% elif annotation == "poly" %}
 <script type="text/javascript" src="{% static 'js/polygon_annotation.js' %}"></script>
 {% endif %}

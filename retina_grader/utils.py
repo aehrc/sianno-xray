@@ -32,6 +32,25 @@ def save_rect_info(doc, rect_info, scale):
 			)
 	return 
 
+def save_foot_rect_info(doc, rect_info, scale):
+	print("---------")
+	print(doc.random_id)
+	print("----------")
+	print(rect_info)
+	doc.scale = scale
+	print(doc.save())
+	Rectangle.objects.filter(document = doc).delete()
+	for idx, item in enumerate(rect_info):
+		print(item["y"])
+		print(item["x"], item["width"], item["height"])
+		Rectangle.objects.create(document = doc, x = item["x"], y = item["y"], width = item["width"], height = item["height"],
+			annotation_type = item["annotation_type"]
+			# fracture_on_current_view= item["fracture_on_current_view"], 
+			# fracture_on_other_view= item["fracture_on_other_view"], 
+			# view_type = item["view_type"]
+			)
+	return 
+
 #Save polygon and associated point information to database
 def save_polygon_info(doc, polygons):
 	print("save_polygon_info")
@@ -57,10 +76,11 @@ def get_rect_info(doc):
 	rects = []
 	for item in doc.rectangle_set.all():
 		rects.append({"x": str(item.x), "y": str(item.y), "width": str(item.width), "height": str(item.height),		 
-		 "bone_number" : item.bone_number,
-		 "fracture_on_current_view": item.fracture_on_current_view,
-		 "fracture_on_other_view" : item.fracture_on_other_view,
-		 "view_type" : item.view_type
+		#  "bone_number" : item.bone_number,
+		#  "fracture_on_current_view": item.fracture_on_current_view,
+		#  "fracture_on_other_view" : item.fracture_on_other_view,
+		#  "view_type" : item.view_type,
+		 "annotation_type": item.annotation_type
 		 })
 	return rects
 
@@ -93,6 +113,19 @@ def get_polygon_info(doc):
 
 
 def write_docs(doc):
+	path_to_save = settings.MEDIA_ROOT + "/" + str(doc.id) + "/"
+	json_name = path_to_save + "rect.json"
+	rects = get_rect_info(doc)
+
+	if not os.path.exists(path_to_save):
+		os.makedirs(path_to_save)
+
+	with open(json_name, "w") as f:
+		json.dump(rects, f, ensure_ascii=False)
+
+	return 
+
+def write_docs_foot(doc):
 	path_to_save = settings.MEDIA_ROOT + "/" + str(doc.id) + "/"
 	json_name = path_to_save + "rect.json"
 	rects = get_rect_info(doc)

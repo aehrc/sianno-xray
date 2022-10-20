@@ -202,6 +202,11 @@ class Rectangle(models.Model):
 	fracture_on_other_view = models.CharField(max_length=20,null=True, blank=True, default = "No")
 	view_type = models.CharField(max_length=20,null=True, blank=True, default = "unknown")
 
+	#firled for foot xray
+	annotation_type = models.CharField(max_length=50,null=True, blank=True, default = "unknown")
+
+
+
 # a polygon attached to a document object via ForeignKey.  In case of multiple polygons, the point coordinates are
 # stored in seperate class, Point
 class Polygon(models.Model):
