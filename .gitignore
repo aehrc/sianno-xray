@@ -1,8 +1,11 @@
 .DS_Store
 settings_maryam.py
+settings_jv.py
 venv
 __pycache__/
 *.py[cod]
 media_root
 meh011
 db.sqlite3
+experiments/
+media_root/

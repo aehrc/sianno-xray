@@ -1,3 +1,7 @@
+
+
+
+
 //------------------------Global scope variables----------------------------//
 //constants
 var HANDLE_R = 5;
@@ -15,26 +19,39 @@ var MIN_TRANSLATE_Y = -MAX_TRANSLATE_Y;
 var MIN_RECT_WIDTH = 10;
 var MIN_RECT_HEIGHT = 10;
 
-//d3.json fetches the rectangles for that document id that are stored as /rect.json'. 
-//Update then puts the rectangles onto the image
-var global_data_foot = []
+
+var global_data_foot = []; //global variable to store the rectanglel data
+
+//select div container with id of imageBody-wx, add it to SVG with width and height adjusted
+var svg = d3.select("#imageBody-FX").append("svg")
+  .attr("width", width/scale)
+  .attr("height", height/scale);
+
+  //get text annotation
+var text = svg.selectAll("text");
+//add svg to group
+var g_foot = svg.append("g"); //group
+
+var rects ;//Global rectangle variable
+
+//Load the data from the server and store the data in the global variable
 d3.json('/media/' + document_id + '/rect.json', function(error, data){
 	data.forEach(function(rect){
 		global_data_foot.push(rect);
-	});	
+    });
+
+
+
+
+
+
+//call the update function once the data is received
 	update();
-});//end of json
+
+});//end of get json
 
 
-//Not used
-var
-  inpX = document.getElementById("x"),
-  inpY = document.getElementById("y"),
-  inpWidth = document.getElementById("width"),
-  inpHeight = document.getElementById("height");
 
-//null, null, null, null
-console.log("inpX = " + inpX + ", inpY = " + inpY + ", width = " + inpWidth + ", height = " + inpHeight);
 
 //Get image scale
 if(type == "PANAROMIC"){
@@ -47,19 +64,13 @@ if(type == "PANAROMIC"){
   };
 }
 
-//select div container with id of imageBody-wx, add it to SVG with width and height adjusted
-var svg = d3.select("#imageBody-FX").append("svg")
-  .attr("width", width/scale)
-  .attr("height", height/scale);
-//get text annotation
-var text = svg.selectAll("text");
-//add svg to group
-var g_foot = svg.append("g"); //group
 
-//Still unsure of this one
+
+
+//Key Down Event for the whole G element
 g_foot.on("keydown", function(){
 	if(d3.event.key == "Backspace" || d3.event.key == "Delete"){
-    console.log("keydown; backspace or delete");
+    //console.log("keydown; backspace or delete");
     //need to remove from global_data too
     g_foot.selectAll(".active").each(function(){
       width = d3.select(this).attr("width");
@@ -91,11 +102,10 @@ var img = g_foot.append("svg:image")
 	.on("mouseup", mouseup);
 
 
-//--------------------------- Functions -----------------------------//
 
 //draw a rectangle on the image when clicked
 function mousedown() {
-  event.stopPropagation();
+  d3.event.stopPropagation();
   var m = d3.mouse(this);
   rect = g_foot.append("g").classed("rectangle", true).
     append("rect")
@@ -116,16 +126,10 @@ function mousedown() {
     g_foot.on("mousemove", mousemove);
 }
 
-//not used
-function keydown(){
-	if(d3.event.key == "delete"){
-    console.log('delete')
-		d3.selectAll(".active").remove();
-	}
-};
 
+//on mouse move
 function mousemove(d) {
-  console.log("mousemove");
+  // console.log("mousemove");
 	var m = d3.mouse(this);
 
 	rect.attr("width", Math.max(0, m[0] - +rect.attr("x")))
@@ -133,8 +137,9 @@ function mousemove(d) {
 		.style("opacity", 0.4);
 };
 
+
 function toggle_active(d){
-  console.log("toggle_active");
+  // console.log("toggle_active");
   d3.selectAll(".active").classed("active", false);
 	if(d3.select(this).classed("active")){
 		d3.select(this).classed("active", false);
@@ -144,15 +149,14 @@ function toggle_active(d){
 };
 
 function mouseup() {
-  console.log("mouseup");
-	// event.stopPropagation();
+  // console.log("mouseup");
 	g_foot.on("mousemove", null);
 	redraw_new_rect();	
 }
 
 function redraw_new_rect(){
 
-  console.log("redraw_new_rect");
+  // console.log("redraw_new_rect");
   d3.selectAll(".active").classed("active", false);
   //JV fix for removing active data . Modify the data to disable all selection
   for (i = 0 ; i < global_data_foot.length ; i++)
@@ -170,11 +174,6 @@ function redraw_new_rect(){
 		}else{
 			global_data_foot.push({"x": x, "y": y, "width": width, "height": height,
        "annotation_type":"unknown",
-      //  "fracture_on_current_view":"unknown",
-      //  "fracture_on_other_view":"unknown",
-      //  "view_type":"unknown",
-
-
 			 "active": active});
 			d3.select(this).remove();
 		}
@@ -188,7 +187,7 @@ var zoom_d = d3.zoom()
 
 
 function zoom_foot() {
-  console.log("zoom foot")
+  // console.log("zoom foot")
   g_foot.attr('transform', 'translate(' + d3.event.transform.x + ',' + d3.event.transform.y + ') scale(' + d3.event.transform.k + ')');
   //  text.attr("transform","scale(" + d3.event.transform.scale().x + " " + d3.event.transform.scae().y + ")");
 }
@@ -198,11 +197,11 @@ g_foot.call(zoom_d);
 // DISABLE double click for zoom
 g_foot.on("dblclick.zoom", null);
  
-update();
+// update();
 
 
 function resizerHover() {
-  console.log("resizeHover");
+  // console.log("resizeHover");
   var el = d3.select(this), isEntering = d3.event.type === "mouseenter";
   el
     .classed("hovering", isEntering)
@@ -214,7 +213,7 @@ function resizerHover() {
 }
 
   function rectResizeStartEnd() {
-    console.log("rectResizeStartEnd");
+    // console.log("rectResizeStartEnd");
     var el = d3.select(this), isStarting = d3.event.type === "start";
     d3.select(this)
       .classed("resizing", isStarting)
@@ -226,7 +225,7 @@ function resizerHover() {
   }
 
   function rectResizing(d) {
-    console.log("rectResizing");
+    // console.log("rectResizing");
     var dragX = Math.max(
       Math.min(d3.event.x, MAX_TRANSLATE_X),
       MIN_TRANSLATE_X
@@ -240,7 +239,7 @@ function resizerHover() {
 
 
     if (d3.select(this).classed("topleft")) {
-      console.log("topleft");
+      // console.log("topleft");
       var newWidth = Math.max(parseInt(d.width) + parseInt(d.x) - parseInt(dragX), MIN_RECT_WIDTH);
 
       d.x  = parseInt(d.x) + parseInt(d.width) - parseInt(newWidth);
@@ -260,7 +259,7 @@ function resizerHover() {
   }
 
   function rectMoveStartEnd(d) {
-    console.log("rectMoveStartEnd");
+    // console.log("rectMoveStartEnd");
     d3.select(this).classed("moving", d3.event.type === "start");
   }
 
@@ -283,24 +282,30 @@ function resizerHover() {
 }
 
 function update(){
-  console.log("update");
-	var rects = g_foot
-      .selectAll("g.rectangle")
-      .data(global_data_foot, function (d) {
-        return d;
-     });
-  // var rects = g_foot
-  //     .selectAll("g.rectangle")
-  //     .data(global_data_foot)
-  //     .enter()
 
 
-      rects.exit().remove();
+
+  // console.log("update");
+  g_foot
+  .selectAll("g.rectangle").remove();
+
+
+
+  rects = g_foot
+.selectAll("g.rectangle")
+.data(global_data_foot, function (d) {
+  return d;
+});
+
+
     
     var newRects =
       rects.enter()
         .append("g")
         .classed("rectangle", true);
+      
+      
+    
 
     newRects
       .append("rect")
@@ -314,7 +319,7 @@ function update(){
         .on("drag", rectMoving)
       )
       .on("click", function(d){
-      	console.log("update; on click; clicked");
+      	// console.log("update; on click; clicked");
         d3.selectAll(".active").classed("active", false);
             //JV fix for removing active data . Modify the data to disable all selection
         for (i = 0 ; i < global_data_foot.length ; i++)
@@ -326,7 +331,7 @@ function update(){
       })
       // .on("dblclick", open_modal); 
       .on("dblclick", function(d){
-        console.log("what is d: " + d.annotation_type)
+        // console.log("what is d: " + d.annotation_type)
         d["active"] = true;
         open_diabetic_foot_modal(d);
       });
@@ -406,19 +411,19 @@ function update(){
       });
 
     allRects
-      .select("rect.bg")
+      .selectAll("rect.bg")
       .attr("height", function (d) {
-        return d.height;
+        return d.height.toString();
       })
       .attr("width", function (d) {
-        return d.width;
+        return d.width.toString();
       })
       .classed("active", function(d){
       	return d.active;
       });
 
     allRects
-      .select("circle.bottomright")
+      .selectAll("circle.bottomright")
       .attr("cx", function (d) {
         return d.width;
       })
@@ -427,13 +432,14 @@ function update(){
       });
 
     allRects
-      .select("text.toothN")
+      .selectAll("text.toothN")
       .attr("x", function (d) {
         // return 200;
-        console.log(JSON.stringify(d))
+        // console.log(JSON.stringify(d))
         try{
           
-          return x(d.x);
+          // return x(d.x);
+          return 0;
         }
         catch(error){
           console.log("An error occured: " + error)
@@ -441,56 +447,50 @@ function update(){
       })
       .attr("y", function (d) {
         try{
-          return y(d.y);
+          // return y(d.y);
+          return 0;
         }
         catch(error){
           console.log("An error occurred" + error)
         }
         // return 200;
-      });   
-};
+
+      }); 
+      
+      rects.exit().remove();
+
+      
+
+
+
+};//Update
 
 function get_foot_rects(){
-  console.log("get_foot_rects");
-	rects = [];
+  // console.log("get_foot_rects");
+	foot_rects = [];
   toe_number = "";
+
 	g_foot.selectAll("g.rectangle").each(function(d){
-   if(d.annotation_type != "Osteomyelitis"){
-    toe_number = "";
-   }else{
-    toe_number = d.toe_number;
-   }
-		console.log("get foot rects: " + d.x, d.y, d.width, d.height);
-		rects.push({"x": d.x, "y": d.y, "width": d.width, "height": d.height,       
+    if(d.annotation_type != "Osteomyelitis"){
+      toe_number = "";
+     }else{
+      toe_number = d.toe_number;
+     }
+		// console.log("get foot rects: " + d.x, d.y, d.width, d.height);
+		foot_rects.push({"x": d.x, "y": d.y, "width": d.width, "height": d.height,       
       "annotation_type":d.annotation_type,
       "toe_number": toe_number,
   });
 });
   
-      // "fracture_on_current_view":d.fracture_on_current_view,
-      // "fracture_on_other_view":d.fracture_on_other_view,
-      // "view_type":d.view_type)
 
-	// g_wrist.selectAll("rect").each(function(d){
 
-	// 	// var test = d3.select(this.parentNode)._groups[0][0].__data__
-
-	// 	// if(test.x !== null){
-	// 	// 	rects.push({"x": test.x, "y": test.y, "width": test.width, "height": test.height})
-	// 	// }
-
-	// 	rects.push({"x": d3.select(this).attr("x"),
-	// 	 "y": d3.select(this).attr("y"),
-	// 	 "width": d3.select(this).attr("width"),
-	// 	 "height": d3.select(this).attr("height")})
-	// });
-
-	return rects;
+	return foot_rects;
 };
 
 
 function update_info(do_reload, modal_id){
-  console.log("update_info");
+  // console.log("update_info");
 	var foot_rects = get_foot_rects();
 
 	var foot_rects_strings = JSON.stringify(foot_rects);
@@ -511,7 +511,7 @@ function update_info(do_reload, modal_id){
           if (data.result == "OK")
           {
             // alert("success in saving");
-            console.log("success in ajax post");
+            // console.log("success in ajax post");
             if (do_reload == true){
 
               window.location.reload(true);
@@ -569,17 +569,10 @@ function update_info(do_reload, modal_id){
 // 		$("#wxModal").modal();
 //   }
 // };
+	//double-click on rectangle
 
 function open_diabetic_foot_modal(id){
-	//double-click on rectangle
-	console.log("double clicked, open diabetic foot modal");
-	// toggle_active();
-  //if already labelled then these will be logged, otherwise they will all be "unknown"
-	// console.log(JSON.stringify(id["bone_number"]));
-	// console.log(JSON.stringify(id["fracture_on_current_view"]));
-	// console.log(JSON.stringify(id["view_type"]));
-	// console.log(JSON.stringify(id["active"]));
-
+	// console.log("double clicked, open diabetic foot modal");
 	
 	if(type == "FOOT-XRAY"){
 
@@ -607,10 +600,9 @@ function open_diabetic_foot_modal(id){
     // d3.selectAll(".btn.btn-primary.fracture_on_other_view").classed("active", false);
     // d3.select("#__fracture_on_other_view_" + id["fracture_on_other_view"]).classed("active", true);
 
+
     d3.selectAll(".btn.btn-primary.view_type").classed("active", false);
     d3.select("#__view_type_" + id["view_type"]).classed("active", true);
-    console.log(type);
-    console.log("-----------------------");
 		$("#fxModal").modal();
   }
 };
@@ -631,13 +623,14 @@ function btn_clicked_foot(key,value){
   }
 
 	console.log("btn_clicked; " + key + value);
+
   //Deactivates all of the bone_number buttons
 	d3.selectAll(".btn.btn-primary.annotation_button").classed("active", false);
   //Activates only the button with the corresponding value
   d3.select("#__" + value).classed("active", true);
   
-	width = d3.select("rect.active").attr("width");
-	height = d3.select("rect.active").attr("height");
+	width = d3.select("rect.active").attr("width").toString();
+	height = d3.select("rect.active").attr("height").toString();
 
 	filtered_array = global_data_foot.filter(function(elems, i){
                         if(elems.width == width && elems.height == height){
@@ -690,13 +683,24 @@ update();
 
 $(document).ready(function(){
 
-    $("#id_btn_save_next_foot").click(function(){
-        //call update without reloading the page
-        update_info(false, "NO_MODAL"); 
-    }); 
+  $("#id_btn_save_next_foot").click(function(){
+      //call update without reloading the page
+      update_info(false, "NO_MODAL"); 
+  }); 
 
-    $("#id_btn_save_foot_xray").click(function(){
+  $("#id_btn_save_foot_xray").click(function(){
 
-      update_info(true,'#fxModal') 
-    });
+    update_info(true,'#fxModal') 
+  });
+
+
+
+
+
+
+
+
+
 });
+
+
