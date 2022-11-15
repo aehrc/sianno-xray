@@ -289,8 +289,13 @@ function update(){
       .data(global_data_foot, function (d) {
         return d;
      });
+  // var rects = g_foot
+  //     .selectAll("g.rectangle")
+  //     .data(global_data_foot)
+  //     .enter()
 
-    rects.exit().remove();
+
+      rects.exit().remove();
     
     var newRects =
       rects.enter()
@@ -329,9 +334,9 @@ function update(){
       .append("g")
       .classed("circles", true)
       .each(function (d) {
-        console.log("what is this: " + this)
+        // console.log("what is this: " + this)
         var circleG = d3.select(this);
-        console.log("test for Jana-------------");
+        // console.log("test for Jana-------------");
 
         circleG
           .append("circle")
@@ -375,11 +380,18 @@ function update(){
             }
           })
           .style("fill", "orange")
-          
           // .attr("dy", ".35em")
           // .text(d.tooth + " " + d.site + " " + d.depth)
           .text(d.annotation_type)        
           .attr("annotation_type", d.annotation_type)
+          .attr("toe_number", function(i,d){
+            // var toe_name = d.toe_number[i];
+            // var test = "1 Hlx"
+            // var find_string = "input[name='" +  test.toString() + "']"
+            // $("#id_bone_form").find(find_string).prop("checked", true);
+            return d.toe_number;
+            
+          })
           // .attr("fracture_on_current_view", d.fracture_on_current_view)
           // .attr("fracture_on_other_view", d.fracture_on_other_view)
           // .attr("view_type", d.view_type)   
@@ -435,23 +447,30 @@ function update(){
           console.log("An error occurred" + error)
         }
         // return 200;
-      });      
+      });   
 };
 
 function get_foot_rects(){
   console.log("get_foot_rects");
 	rects = [];
-
+  toe_number = "";
 	g_foot.selectAll("g.rectangle").each(function(d){
-
+   if(d.annotation_type != "Osteomyelitis"){
+    toe_number = "";
+   }else{
+    toe_number = d.toe_number;
+   }
 		console.log("get foot rects: " + d.x, d.y, d.width, d.height);
 		rects.push({"x": d.x, "y": d.y, "width": d.width, "height": d.height,       
       "annotation_type":d.annotation_type,
+      "toe_number": toe_number,
+  });
+});
+  
       // "fracture_on_current_view":d.fracture_on_current_view,
       // "fracture_on_other_view":d.fracture_on_other_view,
-      // "view_type":d.view_type
-    })
-	});
+      // "view_type":d.view_type)
+
 	// g_wrist.selectAll("rect").each(function(d){
 
 	// 	// var test = d3.select(this.parentNode)._groups[0][0].__data__
@@ -566,6 +585,21 @@ function open_diabetic_foot_modal(id){
 
     d3.selectAll(".btn.btn-primary.annotation_type").classed("active", false);
     d3.select("#__" + id["annotation_type"]).classed("active", true);
+    $("#__" + id["annotation_type"]+">input").prop("checked", true);
+    d3.select("#__" + id["toe_number"]).classed("active", true);
+    $("#__" + id["toe_number"]+">input").prop("checked", true);
+
+    if(id["annotation_type"] == "Osteomyelitis"){
+      //select the div element and show
+      $("#id_bone_form").show();
+      //otherwise hidehide
+    }else{
+      // $("#id_bone_form").find("input[type='radio']").prop("checked", false);
+      // $("#id_bone_form").find("input[type='label']").prop("active", false);
+      $("#id_bone_form").hide();
+  
+  
+    }
 
     // d3.selectAll(".btn.btn-primary.fracture_on_current_view").classed("active", false);
     // d3.select("#__fracture_on_current_view_" + id["fracture_on_current_view"]).classed("active", true);
@@ -584,7 +618,18 @@ function open_diabetic_foot_modal(id){
 
 function btn_clicked_foot(key,value){
 	
-	
+	if(value == "Osteomyelitis"){
+    //select the div element and show
+    $("#id_bone_form").show();
+    //otherwise hidehide
+  }else{
+    $("#id_bone_form").find("input[type='radio']").prop("checked", false);
+    // $("#id_bone_form").find("input[type='label']").prop("active", false);
+    $("#id_bone_form").hide();
+
+
+  }
+
 	console.log("btn_clicked; " + key + value);
   //Deactivates all of the bone_number buttons
 	d3.selectAll(".btn.btn-primary.annotation_button").classed("active", false);
@@ -598,12 +643,49 @@ function btn_clicked_foot(key,value){
                         if(elems.width == width && elems.height == height){
                             //then that value exist in newEndPointDict
                             global_data_foot[i][key] = value;
+                            if(value != "Osteomyelitis"){
+                              global_data_foot[i]["bone_number"] = "";
+                            }
+                            
                             // update();
                         
                          };//end if
             });//end of filter
             update();
             
+};
+
+function btn_clicked_foot_bone(key, value){
+  // var bone_array = [];
+  // $("#id_bone_form").find("input[type='radio']").each(function(index, obj){
+  //   if($(obj).prop("checked")==true){
+  //     bone_array.push($(obj).attr("name"));
+  //   } 
+    
+  // });
+  //Deactivates all of the bone_number buttons
+	d3.selectAll(".btn.btn-primary.annotation_button").classed("active", false);
+  //Activates only the button with the corresponding value
+  // d3.select("#__" + value).classed("active", true);
+
+
+  width = d3.select("rect.active").attr("width");
+	height = d3.select("rect.active").attr("height");
+  filtered_array = global_data_foot.filter(function(elems, i){
+    if(elems.width == width && elems.height == height){
+        //then that value exist in newEndPointDict
+
+        global_data_foot[i][key] = value;
+
+        // update();
+    
+     };//end if
+});//end of filter
+update();
+
+
+
+
 };
 
 $(document).ready(function(){

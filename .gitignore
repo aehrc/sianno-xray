@@ -3,3 +3,6 @@ settings_maryam.py
 venv
 __pycache__/
 *.py[cod]
+media_root
+meh011
+db.sqlite3

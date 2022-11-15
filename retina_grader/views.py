@@ -67,7 +67,6 @@ def document_pre_save(sender, instance, *args, **kwargs):
 @csrf_exempt
 def detail(request):
 	annotation = "rect-foot" #use "poly" or "rect" to load the respective annotation tool
-
 	#view used for rectangle annotation
 	if annotation == "rect":
 		try:

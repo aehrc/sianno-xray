@@ -17,54 +17,191 @@
             <div class="form-row">
               <div class="col-sm-12 mb-3">
              <div class="btn-toolbar col-sm-12" role="toolbar" aria-label="Toolbar with button groups">
-              <div class="btn-group btn-group-toggle mr-2 flex-wrap" data-toggle="buttons" >
-                <label class="btn btn-primary" name="annotation_type" id="__Osteomyelitis">
-                  <input type="radio"  autocomplete="off" onclick="btn_clicked_foot('annotation_type','Osteomyelitis')"> Osteomyelitis
+              <div class="btn-group mr-2 flex-wrap" data-toggle="buttons" >
+                <label class="btn btn-primary"  id="__Osteomyelitis">
+                  <input type="radio" name="annotation_type"  autocomplete="off" onclick="btn_clicked_foot('annotation_type','Osteomyelitis')"> Osteomyelitis
                 </label>
-                <label class="btn btn-primary" name="annotation_type" id="__Lis_Franc">
-                  <input type="radio"  autocomplete="off" onclick="btn_clicked_foot('annotation_type',' Lis_Franc')"> Lis Franc
+                <label class="btn btn-primary"  id="__Lis_Franc">
+                  <input type="radio" name="annotation_type" autocomplete="off" onclick="btn_clicked_foot('annotation_type','Lis_Franc')"> Lis Franc
                 </label>
-                <label class="btn btn-primary" name="annotation_type" id="__Rocker_bottom_foot">
-                  <input type="radio"  autocomplete="off" onclick="btn_clicked_foot('annotation_type','Rocker_bottom_foot')"> Rocker bottom foot
+                <label class="btn btn-primary"  id="__Rocker_bottom_foot">
+                  <input type="radio" name="annotation_type" autocomplete="off" onclick="btn_clicked_foot('annotation_type','Rocker_bottom_foot')"> Rocker bottom foot
                 </label> 
-                <label class="btn btn-primary" name="annotation_type" id="__Skin_ulcer">
-                    <input type="radio"  autocomplete="off" onclick="btn_clicked_foot('annotation_type','Skin_ulcer')"> Skin ulcer
-                </label>           
+                <label class="btn btn-primary"  id="__Skin_ulcer">
+                    <input type="radio" name="annotation_type" autocomplete="off" onclick="btn_clicked_foot('annotation_type','Skin_ulcer')"> Skin ulcer
+                </label>
+
+                <label class="btn btn-primary"  id="__Septic_arthritis">
+                  <input type="radio" name="annotation_type"  autocomplete="off" onclick="btn_clicked_foot('annotation_type','Septic_arthritis')"> Septic arthritis
+              </label>
                                              
             </div>
           </div>
           </div>
     
-         
-        </div>
-        <!-- end of form row -->
+         </div>
 
-
-    <!--         
-        <p>View type</p>
-        <div class="form-row">
-          <div class="col-md-6 mb-3">
-         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-          <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons" >
-            <label class="btn btn-primary" name="view_type" id="__view_type_1">
-              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','1')"> View 1
-            </label>
-            <label class="btn btn-primary" name="view_type" id="__view_type_2">
-              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','2')"> View 2
-            </label>
-            <label class="btn btn-primary" name="view_type" id="__view_type_3">
-              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','3')"> View 3
-            </label>
-            <label class="btn btn-primary" name="view_type" id="__view_type_4">
-              <input type="radio"  autocomplete="off" onclick="btn_clicked('view_type','4')"> View 4
-            </label>
+     
+      
+        <div class="form-row" id="id_bone_form">
+        <div class="col-sm-12 mb-3">
+        <div class="btn-group mr-2 flex-wrap" data-toggle="buttons" >
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__1_Hlx">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','1_Hlx')" name="1_Hlx">1 Hlx
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__2_Dist">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','2_Dist')" name="2_Dist"> 2 Dist
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__3_Dis">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','3_Dis')" name="3_Dist"> 3 Dist
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__4_Dist">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','4_Dist')" name="4_Dist"> 4 Dist
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__5_Dist">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','5_Dist')" name="5_Dist"> 5 Dist
+              </label>
+            </div>
           </div>
-      </div>
-      </div>
-    
-    </div>
-         -->
-        <!-- end of form row -->
+          <div class="row">
+            <div class="col">
+             
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__2_Mid">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','2_Mid')" name="2_Mid"> 2 Mid
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__3_Mid">
+                <input type="radio" name="annotation_bone"  autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','3_Mid')" name="3_Mid"> 3 Mid
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__4_Mid">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','4_Mid')" name="4_Mid"> 4 Mid
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__5_Mid">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','5_Mid')" name="5_Mid"> 5 Mid
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__1_Prox">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','1_Prox')" name="1_Prox"> 1 Prox
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__2_Prox">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','2_Prox')" name="2_Prox"> 2 Prox
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__3_Prox">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','3_Prox')" name="3_Prox"> 3 Prox
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__4_Prox">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','4_Prox')" name="4_Prox"> 4 Prox
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__5_Prox">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','5_Prox')" name="5_Prox"> 5 Prox
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__1_Met">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','1_Met')" name="1_Met"> 1 Met
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__2_Met">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','2_Met')" name="2_Met"> 2 Met
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__3_Met">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','3_Met')" name="3_Met"> 3 Met
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__4_Met">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','4_Met')" name="4_Met"> 4 Met
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__5_Met">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','5_Met')" name="5_Met"> 5 Met
+              </label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__Med_Cune">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Med_Cune')" name="Med_Cune"> Med Cune
+              </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__Int_Cune">
+    <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Int_Cune')" name="Int_Cune"> Int Cune
+  </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm"  style="width:100%;" id="__Lat_Cune">
+    <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Lat_Cune')" name="Lat_Cune"> Lat Cune
+  </label>
+            </div>
+            <div class="col">
+              <label class="btn btn-primary btn-sm" style="width:100%;" id="__Cuboid">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Cuboid')" name="Cuboid"> Cuboid
+              </label>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm"  style="width:100%;" id="__Navicular">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Navicular')" name="Navicular"> Navicular
+              </label>
+            </div>
+          </div>
+       
+          <div class="row">
+            <div class="col">
+              <label class="btn btn-primary btn-sm"  style="width:100%;" id="__Talus">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Talus')" name="Talus"> Talus
+              </label>
+            </div>
+            <div class="col ">
+              <label class="btn btn-primary btn-sm"  style="width:100%;" id="__Calcaneus">
+                <input type="radio" name="annotation_bone" autocomplete="off" onclick="btn_clicked_foot_bone('toe_number','Calcaneus')" name="Calcaneus"> Calcaneus
+              </label>
+            </div>
+          </div>
+          
+        </div> 
+</div>
+</div>
+</div>
+
       
         </form>
           </div>

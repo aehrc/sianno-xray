@@ -204,6 +204,7 @@ class Rectangle(models.Model):
 
 	#firled for foot xray
 	annotation_type = models.CharField(max_length=50,null=True, blank=True, default = "unknown")
+	toe_number = models.CharField(max_length=250,null=True, blank=True, default = "unknown")
 
 
 

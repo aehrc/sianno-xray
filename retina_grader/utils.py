@@ -11,12 +11,12 @@ import io
 from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+
 #Utils contains functions that don't belong in views, ie: don't return a HTTP Response
 
 def save_rect_info(doc, rect_info, scale):
 	print("---------")
 	print(doc.random_id)
-	print("----------")
 	print(rect_info)
 	doc.scale = scale
 	print(doc.save())
@@ -40,15 +40,24 @@ def save_foot_rect_info(doc, rect_info, scale):
 	doc.scale = scale
 	print(doc.save())
 	Rectangle.objects.filter(document = doc).delete()
+
 	for idx, item in enumerate(rect_info):
 		print(item["y"])
 		print(item["x"], item["width"], item["height"])
-		Rectangle.objects.create(document = doc, x = item["x"], y = item["y"], width = item["width"], height = item["height"],
-			annotation_type = item["annotation_type"]
+		created_rect = Rectangle.objects.create(document = doc, x = item["x"], y = item["y"], width = item["width"], height = item["height"],
+			annotation_type = item["annotation_type"],
+			toe_number = item["toe_number"],
+
 			# fracture_on_current_view= item["fracture_on_current_view"], 
 			# fracture_on_other_view= item["fracture_on_other_view"], 
 			# view_type = item["view_type"]
 			)
+
+		# toe_numbers = item["toe_number"].split(",")
+		print("=============================")
+		print(item["toe_number"])
+		print("=============================")
+		
 	return 
 
 #Save polygon and associated point information to database
@@ -80,7 +89,8 @@ def get_rect_info(doc):
 		#  "fracture_on_current_view": item.fracture_on_current_view,
 		#  "fracture_on_other_view" : item.fracture_on_other_view,
 		#  "view_type" : item.view_type,
-		 "annotation_type": item.annotation_type
+		 "annotation_type": item.annotation_type,
+		 "toe_number": item.toe_number,
 		 })
 	return rects
 
