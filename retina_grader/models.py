@@ -151,9 +151,9 @@ class Document(models.Model):
 	height = models.PositiveIntegerField(blank=True, null=True)
 
 	scale = models.DecimalField(max_digits=16, decimal_places=12, default=1.0)
-	document = models.ImageField(blank=True, null=True,
-		height_field='height',
-		width_field='width',
+	document = models.FileField(blank=True, null=True,
+		# height_field='height',
+		# width_field='width',
 		storage=FileSystemStorage(location=settings.MEDIA_ROOT),
 		upload_to=get_file_location_path)
 
@@ -168,7 +168,7 @@ class Document(models.Model):
 	patient_id = models.CharField(max_length = 20, default="UNASSIGNED")#patient ID
 	accession_no = models.CharField(max_length = 100, default="UNASSIGNED")#accession number
 	view_position =  models.CharField(max_length = 100, default="UNASSIGNED")#accession number
-
+	anatomy = models.CharField(max_length = 100, default="Not Available")#anatomy
 	class Meta:
 		if settings.USE_RANDOM_ID : 
 			ordering = ['random_id']

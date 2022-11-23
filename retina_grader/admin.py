@@ -4,7 +4,7 @@ from .models import Grading, GradingType, GradingValueSet, GradingField, Documen
 
 class DocumentAdmin(admin.ModelAdmin):
 	#readonly_fields = ['random_id']
-	fields = ["document", "status", "allocated_to", "random_id", "type", "purpose", "accession_no","view_position","scale", "width", "height"]
+	fields = ["document", "status", "allocated_to", "random_id", "type", "purpose", "accession_no","view_position","anatomy","scale", "width", "height"]
 	list_max_show_all = 2000
 
 

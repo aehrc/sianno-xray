@@ -16,7 +16,8 @@
     height =  "{{doc.height}}",
     type = "{{doc.type}}",
     scale = "{{doc.scale}}";
-    url = "/media/{{ doc.document.name }}";
+    // url = "/media/{{ doc.document.name }}";
+    url = "/sianno/get_image/?document_id={{ doc.id }}";
     document_id = "{{ doc.id }}";
 
   // var this_page = "{{this_page}}";
@@ -149,6 +150,10 @@
   <form method="post" id="form-next-foot-grading" >
     {% csrf_token %}
     <input type="hidden" name="save_next_foot_xray" value="yes">
+    <label class="label label-info" >Accession Number: {{doc.accession_no}}</label>
+    <label class="label label-info" >View Position: {{doc.view_position}}</label>
+    <label class="label label-info" >Anatomy: {{doc.anatomy}}</label>
+
     <label class="btn btn-danger">
       <input type="checkbox" name= "exclude_accession_number"/>
         Exclude this Accession Number

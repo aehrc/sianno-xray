@@ -12,23 +12,29 @@ var table_draft = new Tabulator("#id_table_worklist_draft", {
         window.location = "/sianno/detail/?d="+row.getIndex();
     
     },
-    height:"311px",
+    height:"600px",
 
 //     groupBy:"status",
 // groupValues:[["Draft", "Reviewed"]],
 layout:"fitDataStretch",
 
     columns:[
-    {title:"ID", field:"id"},
-    {title:"Status", field:"status"},
-    {title:"User", field:"user"},
-    {title:"Purpose", field:"purpose"},
-    {title:"Type", field:"type"}, 
+    {title:"Accesstion No", field:"accession_no"},
+
+    // {title:"ID", field:"id"},
+    {title:"Anatomy", field:"anatomy"},
+    {title:"View", field:"view_position"},
+
+
+    // {title:"Status", field:"status"},
+    // {title:"User", field:"user"},
+    // {title:"Purpose", field:"purpose"},
+    // {title:"Type", field:"type"}, 
 
     {
         title:"Date Modified", 
         field:"date_modified", 
-        hozAlign:"center", 
+        hozAlign:"right", 
         formatter:"datetime",
         formatterParams: {outputFormat:"DD/MM/YY HH:mm", inputFormat:'DD/MM/YY HH:mm Z ZZ', timezone:"Australia/Perth"},
 },
@@ -45,23 +51,26 @@ var table_reviewed = new Tabulator("#id_table_worklist_reviewed", {
         window.location = "/sianno/detail/?d="+row.getIndex();
     
     },
-    height:"311px",
+    height:"600px",
 
 //     groupBy:"status",
 // groupValues:[["Draft", "Reviewed"]],
-layout:"fitDataStretch",
+// layout:"fitColumns",
 
     columns:[
-    {title:"ID", field:"id"},
-    {title:"Status", field:"status"},
-    {title:"User", field:"user"},
-    {title:"Purpose", field:"purpose"},
-    {title:"Type", field:"type"}, 
+    {title:"Accession No", field:"accession_no"},
+    {title:"Anatomy", field:"anatomy"},
+    {title:"View", field:"view_position"},
+    // {title:"ID", field:"id"},
+    // {title:"Status", field:"status"},
+    // {title:"User", field:"user"},
+    // {title:"Purpose", field:"purpose"},
+    // {title:"Type", field:"type"}, 
 
     {
         title:"Date Modified", 
         field:"date_modified", 
-        hozAlign:"center", 
+        hozAlign:"right", 
         formatter:"datetime",
         formatterParams: {outputFormat:"DD/MM/YY HH:mm", inputFormat:'DD/MM/YY HH:mm Z ZZ', timezone:"Australia/Perth"},
 

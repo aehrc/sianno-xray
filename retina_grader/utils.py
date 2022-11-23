@@ -171,7 +171,18 @@ def read_dcm_file(file,file_name):
 	print("After reading the file")
 	accession_number = ds.AccessionNumber
 	study_date = ds.StudyDate
-	view_position = ds.ViewPosition
+	view_position = "Not Available"
+	anatomy = "Not Available"
+
+	# view_position = ds.ViewPosition
+	if ((0x0018, 0x1030) in ds): 
+		view_position = ds[0x0018, 0x1030].value
+	if ((0x0040, 0x0254) in ds): 
+		anatomy = ds[0x0040, 0x0254].value
+		
+	#(0018, 1030) # View posion for foot
+	#(0040, 0254) #anatomy for foot
+
 	print("after reading meta data")
 	image_2d = ds.pixel_array.astype(float)
 	print("read the pixel array")
@@ -180,6 +191,7 @@ def read_dcm_file(file,file_name):
 	image_byte = io.BytesIO()
 	
 	# Image.fromarray(image_2d_scaled).save("/Users/vig00a/Downloads/test.jpg")	
-	Image.fromarray(image_2d_scaled).convert("L").save(image_byte, format="JPEG")
+	im = Image.fromarray(image_2d_scaled).convert("L")
+	im.save(image_byte, format="JPEG")
 	memory_file = InMemoryUploadedFile(image_byte,None, file_name.replace(".dcm",".jpg"), 'image/jpeg',image_byte.seek(0,os.SEEK_END), None) 
-	return (File(memory_file),accession_number,study_date, view_position)
+	return (File(memory_file),accession_number,study_date, view_position, anatomy, im.height,im.width)

@@ -288,11 +288,11 @@ def index(request):
 @login_required
 def index_json(request):
 	if request.user.groups.filter(name__in=["coordinator"]).exists() : 
-		document_list = Document.objects.filter(allocated_to = request.user, status = request.GET["status"])
+		document_list = Document.objects.filter(allocated_to = request.user, status = request.GET["status"]).order_by("accession_no")
 		# total_count = Document.objects.all().count()
 		# completed_count = Document.objects.filter(status = "Reviewed").count()
 	else:
-		document_list = Document.objects.filter(allocated_to = request.user, status = request.GET["status"])
+		document_list = Document.objects.filter(allocated_to = request.user, status = request.GET["status"]).order_by("accession_no")
 		# total_count = Document.objects.filter(allocated_to = request.user).count()
 		# completed_count = Document.objects.filter(allocated_to = request.user, status = "Reviewed").count()
 	
@@ -304,6 +304,9 @@ def index_json(request):
 "user": doc.allocated_to.username,
 "purpose":doc.purpose,
 "type": doc.type,
+"accession_no" : doc.accession_no,
+"view_position": doc.view_position,
+"anatomy": doc.anatomy,
 "date_modified" : doc.date_modified.strftime("%d/%m/%y %H:%M %z")
 
 		})
@@ -340,9 +343,12 @@ def data_export(request):
 					 "y": rect.y,
 					  "width": rect.width,
 					   "height": rect.height,
-					    "bone_number": rect.bone_number,
-					      "fracture_on_current_view": rect.fracture_on_current_view, 
-					      "fracture_on_other_view": rect.fracture_on_other_view})
+					    # "bone_number": rect.bone_number,
+					    #   "fracture_on_current_view": rect.fracture_on_current_view, 
+					    #   "fracture_on_other_view": rect.fracture_on_other_view, 
+						  "annotation_type" : rect.annotation_type,
+						  "toe_number" : rect.toe_number,
+						  })
 			except:
 				pass	
 
@@ -350,24 +356,27 @@ def data_export(request):
 					"System ID" : str(d.id),
 					"file_name" : d.document.name,
 						"allocated_to": d.allocated_to.username,
-						 "type" : d.type,
-						"purpose" : d.purpose,
-
+						#  "type" : d.type,
+						# "purpose" : d.purpose,
 						 "status" : d.status,
 						#  "Quality of images" : gx_quality,
 						#  "Orientation" : gx_orientation,
 						#  "Presence of Caries" : gx_caries,
 						"view_type" : d.view_position,
 						"accession_no" : d.accession_no,
+						"anatomy": d.anatomy,
 
 						 "Rectangles" : rectangles,
 						 "scale": d.scale
 						 })
 
 		with open('export.csv', mode='w') as csv_file:
-			field_names = ["System ID","file_name","allocated_to","type","purpose","status",
+			field_names = ["System ID","file_name","allocated_to",
+			# "type",
+			# "purpose",
+			"status",
 			#"Quality of images","Orientation","Presence of Caries",
-			"view_type","accession_no",
+			"view_type","accession_no","anatomy",
 			"Rectangles", "scale"]
 			csvw = csv.DictWriter(csv_file, field_names)
 			csvw.writeheader()
@@ -381,11 +390,15 @@ def data_export(request):
 
 @login_required
 def new_files(request):
+	
 	if request.user.groups.filter(name__in=["coordinator"]).exists() : 
 		if request.method == "GET":
 			users = User.objects.all()
 			purposes = ["GRADING"] #"SCREENING",
-			image_types = ["WRIST-XRAY", "FOOT-XRAY"] #"BITEWING", "PANAROMIC", "RETINA", "OTHER",
+			image_types = [
+				# "WRIST-XRAY", 
+				"FOOT-XRAY"
+				] #"BITEWING", "PANAROMIC", "RETINA", "OTHER",
 
 			return render(request,"modals/new_files_modal.html", {"users": users, "purposes": purposes, "image_types": image_types})
 		elif request.method == "POST":
@@ -400,13 +413,17 @@ def new_files(request):
 					#if the file is a dicom image then load the DICOM tags and convert into an image
 					if file.name.endswith(".dcm"):
 						try:
-							print(str(file))
+							# print(str(file))
 							path = default_storage.save('tmp/' + file.name ,ContentFile(file.read()))
 							temp_file = os.path.join(settings.MEDIA_ROOT,path)
-							djangofile,accesstion_number,study_date, view_position = read_dcm_file(temp_file,file.name)
+							djangofile,accesstion_number,study_date, view_position,anatomy, height, width = read_dcm_file(temp_file,file.name)
+							# #store the dicom file as DICOM file in the document and igore the file read by the read_dcm_file. TODO decide whether we need to render DICOM on demand
+							djangofile = File(file)
+							
 							new_document = Document(allocated_to = selected_user,
 							type=image_type,purpose= purpose, document=djangofile,
-							 accession_no = accesstion_number, view_position = view_position)
+							 accession_no = accesstion_number, view_position = view_position, anatomy = anatomy, 
+							 height = height, width = width)
 							new_document.save()
 							os.remove(temp_file)
 						except Exception as ex:
@@ -423,3 +440,46 @@ def new_files(request):
 		return 
 	else:
 		return HttpResponse("Sorry, Not authorized")
+
+from pydicom import dcmread
+import io
+import numpy as np
+from PIL import Image
+
+
+@login_required
+def get_image(request):
+	# http://localhost:8001/sianno/get_image/?document_id=10314
+	#returns the image. 
+	if request.method == "GET" :
+		try:
+
+			document_id = request.GET["document_id"]
+			doc = Document.objects.get(id=document_id)
+			if doc.document.name.endswith(".dcm"):
+				#read the file as memory file and return as image. 
+				ds = dcmread (settings.MEDIA_ROOT+ "/" + str(doc.document))
+				image_2d = ds.pixel_array.astype(float)
+				image_2d_scaled = (np.maximum(image_2d,0) / image_2d.max()) * 255.0
+				image_2d_scaled = np.uint8(image_2d_scaled)
+				response = HttpResponse()
+				response["Content-Type"] = "image/jpeg"
+
+				# image_byte = io.BytesIO()
+				im = Image.fromarray(image_2d_scaled).convert("L").save(response, format="JPEG")
+				return response
+				# with open(settings.MEDIA_ROOT+str(doc.document), "rb") as f:
+		# 	return HttpResponse(f.read())
+				# pass
+			else:
+
+
+				urlstring = "/media/"+str(doc.document)
+				response = HttpResponseRedirect(urlstring)
+				return response
+		
+
+		except Exception as e:
+			print (e)
+			response = HttpResponse("file error")
+			return response
