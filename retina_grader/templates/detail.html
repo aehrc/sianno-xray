@@ -146,8 +146,11 @@
 {% endif %}
 
 {% if doc.purpose == "GRADING" and doc.type == "FOOT-XRAY" %}
-<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 300px; color: black; padding:10px"> 
-  <form method="post" id="form-next-foot-grading" >
+<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 400px; color: black; padding:10px"> 
+  
+
+  
+  <form method="post" id="form-next-foot-grading" class="form" >
     {% csrf_token %}
     <input type="hidden" name="save_next_foot_xray" value="yes">
     <label class="label label-info" >Accession Number: {{doc.accession_no}}</label>
@@ -158,6 +161,52 @@
       <input type="checkbox" name= "exclude_accession_number"/>
         Exclude this Accession Number
     </label>
+
+    {% for g in doc.grading_set.all %}
+    {% if  g.grading_field.grading_type.ui_control_type == "Radio"  %}
+   <!-- <fieldset> -->
+    <h5>{{ g.grading_field.grading_type }}</h5>
+
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+
+         {% for item in g.grading_field.grading_type.gradingvalueset_set.all %}
+
+
+                               
+                                <label for = "grading_{{g.id}}_{{g.grading_field}}_{{ item.id}}" class="btn btn-success" >   <input
+                                  id = "grading_{{g.id}}_{{g.grading_field}}_{{ item.id}}"
+                                  type="radio"
+                                     name="grading_{{g.id}}"
+                                     value="{{ item.value }}"
+                              {% if g.value == item.value %}
+                                     checked="checked"
+                              {% endif %}
+                              />
+                              {{ item.value }}</label>
+
+                                
+
+                            {% endfor %}
+
+
+                                </div>
+
+<!-- </fieldset> -->
+    {% elif g.grading_field.grading_type.ui_control_type == "TextArea" %}
+        <fieldset>
+        <legend>{{ g.grading_field.grading_type }}:</legend>
+
+
+
+        <textarea cols="200" rows="5", name="grading_{{g.id}}", id="grading_{{g.id}}">{{ g.value }}</textarea>
+        </fieldset>
+    {% endif %}
+{% endfor  %}
+
+
+
+
 <label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
     <button type="button" id="id_btn_save_next_foot" class="btn btn-primary float-right">Save & Next</button>
     </form>

@@ -105,7 +105,12 @@ var img = g_foot.append("svg:image")
 
 //draw a rectangle on the image when clicked
 function mousedown() {
+//create rectangles only using the middle mouse button (which enables the mouse drag on primary click)
+if (d3.event.button === 1)
+{
   d3.event.stopPropagation();
+  
+  
   var m = d3.mouse(this);
   rect = g_foot.append("g").classed("rectangle", true).
     append("rect")
@@ -124,6 +129,14 @@ function mousedown() {
         open_foot_xray_modal(d);
     });
     g_foot.on("mousemove", mousemove);
+
+
+  }
+  else{
+
+    //propagate the event for dragging...
+    
+  }
 }
 
 
@@ -182,6 +195,10 @@ function redraw_new_rect(){
 }
 
 var zoom_d = d3.zoom()
+// .filter(function(){
+//   return (d3.event.button === 0 ||
+//           d3.event.button === 1);
+// })
   .scaleExtent([1, 10])
   .on("zoom", zoom_foot);
 

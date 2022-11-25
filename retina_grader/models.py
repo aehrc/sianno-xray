@@ -99,6 +99,21 @@ VALUE_SET_CHOICES = (
 	('Correct', 'Correct'),
 	('Incorrect', 'Incorrect'),	
 
+	#Diabetic Foot XRAY types
+	#Body Parts
+
+	('Ankle', 'Ankle'),	
+	('Foot', 'Foot'),	
+	('Forefoot', 'Forefoot'),	
+	('Other', 'Other'),
+#View Types
+
+('DP','DP'),
+('Obl','Obl'),
+('Lat','Lat'),
+
+
+
 )
 
 #store the image under user's name
