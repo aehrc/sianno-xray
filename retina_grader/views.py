@@ -146,9 +146,6 @@ def detail(request):
 					"total_count" : total_count,
 					"annotation" : annotation})
 			elif request.method == "POST":
-				print("AM I HERE???????????")
-				print("Post request: ", request.POST)
-				print("AM I HERE???????????")
 				if "wrist_xray" in request.POST:
 					print("updating wrist xray info")
 					wrist_xray_rects = json.loads(request.POST['wrist_xray_rects'])
@@ -463,10 +460,12 @@ def get_image(request):
 				image_2d_scaled = (np.maximum(image_2d,0) / image_2d.max()) * 255.0
 				image_2d_scaled = np.uint8(image_2d_scaled)
 				response = HttpResponse()
-				response["Content-Type"] = "image/jpeg"
-
+				# response["Content-Type"] = "image/jpeg"
+				response["Content-Type"] = "image/png"
+				# format = "jpeg"
+				format = "PNG"
 				# image_byte = io.BytesIO()
-				im = Image.fromarray(image_2d_scaled).convert("L").save(response, format="JPEG")
+				im = Image.fromarray(image_2d_scaled).convert("L").save(response, format=format)
 				return response
 				# with open(settings.MEDIA_ROOT+str(doc.document), "rb") as f:
 		# 	return HttpResponse(f.read())
