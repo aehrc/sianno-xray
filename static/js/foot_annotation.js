@@ -86,7 +86,7 @@ g_foot.on("keydown", function(){
       });//end of filter
     })
         update();
-        update_info(true, "NO____MODAL"); 
+        // update_info(true, "NO____MODAL"); 
         //g_wrist.selectAll(".active").remove();        
   }
 }).on("focus",function(){});
@@ -707,7 +707,9 @@ $(document).ready(function(){
 
   $("#id_btn_save_foot_xray").click(function(){
 
-    update_info(true,'#fxModal') 
+    // update_info(true,'#fxModal') 
+    $("#fxModal").modal('hide');
+
   });
 
 
