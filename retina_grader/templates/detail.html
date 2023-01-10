@@ -22,7 +22,7 @@
 
   // var this_page = "{{this_page}}";
 </script>
-{% if annotation == "rect-foot" %}
+{% if annotation == "rect-foot-student" %}
 <script src="/static/js/d3.v4.min.js"></script>
 {% elif annotation == "poly" %}
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -218,7 +218,7 @@
       <div class="row">
         {% include "modals/wrist_xray_modal.html" %}
         {% include "modals/foot_xray_modal.html" %}
-        
+        {% include "modals/student_foot_xray_modal.html" %}
       </div>
 </div>
 
@@ -228,6 +228,8 @@
 <script type="text/javascript" src="{% static 'js/wrist_annotation.js' %}"></script>
 {% elif annotation == "rect-foot" %}
 <script type="text/javascript" src="{% static 'js/foot_annotation.js' %}"></script>
+{% elif annotation == "rect-foot-student" %}
+<script type="text/javascript" src="{% static 'js/student_foot_annotation.js' %}"></script>
 {% elif annotation == "poly" %}
 <script type="text/javascript" src="{% static 'js/polygon_annotation.js' %}"></script>
 {% endif %}

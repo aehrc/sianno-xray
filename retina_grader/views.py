@@ -19,7 +19,7 @@ import json
 
 import os
 
-from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
+from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs, save_foot_rect_info_student
 
 from django.core.files import File
 from django.core.files.storage import default_storage
@@ -66,7 +66,7 @@ def document_pre_save(sender, instance, *args, **kwargs):
 @login_required
 @csrf_exempt
 def detail(request):
-	annotation = "rect-foot" #use "poly" or "rect" to load the respective annotation tool
+	annotation = "rect-foot-student" #use "poly" or "rect" to load the respective annotation tool
 	#view used for rectangle annotation
 	if annotation == "rect":
 		try:
@@ -96,7 +96,7 @@ def detail(request):
 					print("---------SCALE IS-----------")
 					print(scale)
 					print("--------------------")
-					save_foot_rect_info(doc, foot_xray_rects, scale)
+					save_foot_rect_info_student(doc, foot_xray_rects, scale)
 					return JsonResponse({"result" : "OK"})
 
 				if "save_next_wrist_xray" in request.POST:
@@ -128,7 +128,7 @@ def detail(request):
 				return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 		except Exception as ex:
 			return HttpResponse(str(ex))
-	elif annotation == "rect-foot":
+	elif annotation == "rect-foot-student":
 		try:
 			document_id = request.GET["d"]
 			doc = Document.objects.get(id=document_id)
@@ -167,7 +167,7 @@ def detail(request):
 					print("---------SCALE IS-----------")
 					print(scale)
 					print("--------------------")
-					save_foot_rect_info(doc, foot_xray_rects, scale)
+					save_foot_rect_info_student(doc, foot_xray_rects, scale)
 					return JsonResponse({"result" : "OK"})
 				if "save_next_foot_xray" in request.POST:
 					#get exclude value from the form.
@@ -343,7 +343,7 @@ def data_export(request):
 					    # "bone_number": rect.bone_number,
 					    #   "fracture_on_current_view": rect.fracture_on_current_view, 
 					    #   "fracture_on_other_view": rect.fracture_on_other_view, 
-						  "annotation_type" : rect.annotation_type,
+						#   "annotation_type" : rect.annotation_type,
 						  "toe_number" : rect.toe_number,
 						  })
 			except:
@@ -416,7 +416,8 @@ def new_files(request):
 							djangofile,accesstion_number,study_date, view_position,anatomy, height, width = read_dcm_file(temp_file,file.name)
 							# #store the dicom file as DICOM file in the document and igore the file read by the read_dcm_file. TODO decide whether we need to render DICOM on demand
 							djangofile = File(file)
-							
+							if(height > 1000):
+								scale = height/1000
 							new_document = Document(allocated_to = selected_user,
 							type=image_type,purpose= purpose, document=djangofile,
 							 accession_no = accesstion_number, view_position = view_position, anatomy = anatomy, 

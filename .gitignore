@@ -1,6 +1,7 @@
 .DS_Store
 settings_maryam.py
 settings_jv.py
+settings_user.py
 venv
 __pycache__/
 *.py[cod]

@@ -60,6 +60,34 @@ def save_foot_rect_info(doc, rect_info, scale):
 		
 	return 
 
+def save_foot_rect_info_student(doc, rect_info, scale):
+	print("---------")
+	print(doc.random_id)
+	print("----------")
+	print(rect_info)
+	doc.scale = scale
+	print(doc.save())
+	Rectangle.objects.filter(document = doc).delete()
+
+	for idx, item in enumerate(rect_info):
+		print(item["y"])
+		print(item["x"], item["width"], item["height"])
+		created_rect = Rectangle.objects.create(document = doc, x = item["x"], y = item["y"], width = item["width"], height = item["height"],
+			# annotation_type = item["annotation_type"],
+			toe_number = item["toe_number"],
+
+			# fracture_on_current_view= item["fracture_on_current_view"], 
+			# fracture_on_other_view= item["fracture_on_other_view"], 
+			# view_type = item["view_type"]
+			)
+
+		# toe_numbers = item["toe_number"].split(",")
+		print("=============================")
+		print(item["toe_number"])
+		print("=============================")
+		
+	return 
+
 #Save polygon and associated point information to database
 def save_polygon_info(doc, polygons):
 	print("save_polygon_info")
@@ -195,3 +223,34 @@ def read_dcm_file(file,file_name):
 	im.save(image_byte, format="JPEG")
 	memory_file = InMemoryUploadedFile(image_byte,None, file_name.replace(".dcm",".jpg"), 'image/jpeg',image_byte.seek(0,os.SEEK_END), None) 
 	return (File(memory_file),accession_number,study_date, view_position, anatomy, im.height,im.width)
+
+import shutil
+def extract_images_from_folders(folder_path, dest_path):
+	folder_names = os.listdir(folder_path)
+	folder_names.remove(".DS_Store")
+	for folder_name in folder_names:
+		print(folder_name)
+		image_names = os.listdir(os.path.join(folder_path,folder_name))
+		for image_name in image_names:
+			if(image_name.endswith('.dcm')):
+				shutil.copyfile(os.path.join(folder_path, folder_name, image_name), os.path.join(dest_path, image_name))
+	return 
+
+## Create template rectangles for all other documents
+def create_template_rects():
+	temp_doc_left = Document.objects.filter(id = 10372)[0]
+	temp_doc_right = Document.objects.filter(id = 10378)[0]
+	all_other_docs = Document.objects.all().exclude(id__in = [10372, 10378])
+
+	for doc in all_other_docs:
+		if(doc.anatomy.endswith("Left")):
+			for rect in temp_doc_left.rectangle_set.all():
+				rect.id = None
+				rect.document = doc
+				rect.save()
+		else:
+			for rect in temp_doc_right.rectangle_set.all():
+				rect.id = None
+				rect.document = doc
+				rect.save()
+	return 
