@@ -195,3 +195,6 @@ def read_dcm_file(file,file_name):
 	im.save(image_byte, format="JPEG")
 	memory_file = InMemoryUploadedFile(image_byte,None, file_name.replace(".dcm",".jpg"), 'image/jpeg',image_byte.seek(0,os.SEEK_END), None) 
 	return (File(memory_file),accession_number,study_date, view_position, anatomy, im.height,im.width)
+
+
+

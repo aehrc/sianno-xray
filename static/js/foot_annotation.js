@@ -404,7 +404,21 @@ function update(){
           .style("fill", "orange")
           // .attr("dy", ".35em")
           // .text(d.tooth + " " + d.site + " " + d.depth)
-          .text(d.annotation_type)        
+          .text(
+            
+            function(d){
+            //If Ostemyletitis, then return the toe number
+            if (d.annotation_type == "Osteomyelitis")
+            {
+            return d.toe_number.toString();
+            }
+            else
+            {
+              return d.annotation_type ;
+            }
+          }
+            
+            )        
           .attr("annotation_type", d.annotation_type)
           .attr("toe_number", function(i,d){
             // var toe_name = d.toe_number[i];

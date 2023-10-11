@@ -117,3 +117,4 @@ All Polygon, Rectangle, Point, and Grading objects are linked by foreign key wit
 It's a good idea to also manually delete documents and .json files from your media folder.
 
  
+

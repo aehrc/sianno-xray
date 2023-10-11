@@ -19,22 +19,36 @@ import json
 
 import os
 
-from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
 
+from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
+# if settings.DIABETIC_FOOT_AI_ENABLED : 
+# 	from .utils_diabetic_foot_ai import *
+
+
+
+	
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+#import django async task library for post processing upon saving
+
+from django_q.tasks import async_task
 
 #Receivers
 #receives notification from a signal dispatcher that some action has taken place
 @receiver(post_save, sender=Document)
 def document_post_save(sender, instance, *args, **kwargs):
-		if instance.grading_set.count() == 0:
+	print("Document POST Save" , str(instance))
 
-			for gf in GradingField.objects.all():
-				grading = Grading(grading_field=gf, document=instance)
-				grading.value = grading.grading_field.default_value
-				grading.save()
+	async_task("retina_grader.tasks.get_image_from_dicom_and_run_dfai", instance.id)
+
+
+	if instance.grading_set.count() == 0:
+
+		for gf in GradingField.objects.all():
+			grading = Grading(grading_field=gf, document=instance)
+			grading.value = grading.grading_field.default_value
+			grading.save()
 
 
 @receiver(pre_save, sender=Document)
@@ -132,14 +146,19 @@ def detail(request):
 		try:
 			document_id = request.GET["d"]
 			doc = Document.objects.get(id=document_id)
+			# if settings.DIABETIC_FOOT_AI_ENABLED : 
+				# get_image_from_dicom_and_run_dfai(document_id)
+				# get_image_from_dicom_and_run_dfai(document_id)
 			write_docs(doc)
 			total_count = Document.objects.filter(allocated_to = request.user).count()
 			completed_count = Document.objects.filter(status="Reviewed", allocated_to=request.user).count()
-
+			
 			if request.method == "GET":
 				print("GET Request: ", request.GET)
 				if doc == None:
 					return HttpResponse("Record Cannot be opened or you are not authorised")
+				#run the AI inference from here. 
+				
 				return render(request, "detail.html", {
 					"doc": doc,
 					"completed_count" : completed_count,

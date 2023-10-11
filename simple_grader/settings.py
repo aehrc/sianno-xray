@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'retina_grader'
+	'retina_grader',
+    'django_q'
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,23 @@ USE_TZ = True
 TIME_ZONE = 'Australia/Perth'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440000#2.5G
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440000#2.5G
+
+DIABETIC_FOOT_AI_ENABLED = False
+
+#Django Q_Cluster settings
+
+Q_CLUSTER = {
+    'name': 'sianno-xray',
+    'workers': 8,
+    'recycle': 500,
+    'timeout': 60,
+    'compress': True,
+    'save_limit': 250,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'redis': {
+        'host': '127.0.0.1',
+        'port': 6379,
+        'db': 0, }
+}

@@ -2,6 +2,7 @@
 settings_maryam.py
 settings_jv.py
 venv
+venv*
 __pycache__/
 *.py[cod]
 media_root
@@ -9,3 +10,10 @@ meh011
 db.sqlite3
 experiments/
 media_root/
+keras_frcnn
+dfai_files
+*.hdf5
+Yolov7_deployment
+ai_run_jobs
+image_registration
+document_tray

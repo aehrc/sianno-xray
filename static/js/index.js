@@ -79,6 +79,44 @@ var table_reviewed = new Tabulator("#id_table_worklist_reviewed", {
 
 table_reviewed.setData("/sianno/index_json/?status=Reviewed");
 
+// Data Table for AI detection
+
+
+var table_draft_ai_generated = new Tabulator("#id_table_draft_ai_generated", {
+    rowClick:function(e, row){
+        window.location = "/sianno/detail/?d="+row.getIndex();
+    
+    },
+    height:"600px",
+
+//     groupBy:"status",
+// groupValues:[["Draft", "Reviewed"]],
+// layout:"fitColumns",
+
+    columns:[
+    {title:"Accession No", field:"accession_no"},
+    {title:"Anatomy", field:"anatomy"},
+    {title:"View", field:"view_position"},
+    // {title:"ID", field:"id"},
+    // {title:"Status", field:"status"},
+    // {title:"User", field:"user"},
+    // {title:"Purpose", field:"purpose"},
+    // {title:"Type", field:"type"}, 
+
+    {
+        title:"Date Modified", 
+        field:"date_modified", 
+        hozAlign:"right", 
+        formatter:"datetime",
+        formatterParams: {outputFormat:"DD/MM/YY HH:mm", inputFormat:'DD/MM/YY HH:mm Z ZZ', timezone:"Australia/Perth"},
+
+    },],
+});
+
+table_draft_ai_generated.setData("/sianno/index_json/?status=Draft_AI_Generated");
+
+
+
 $("#uploadDiv").load("/sianno/new_files");
 
 $("#btn_upload").click(function(){
