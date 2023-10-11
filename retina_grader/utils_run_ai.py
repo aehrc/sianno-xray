@@ -1,5 +1,5 @@
 #Runs the AI as a batch process
-from retina_grader.models import Document, Rectangle
+from retina_grader.models import Document, Rectangle, Grading, GradingField
 import uuid
 import os
 from django.conf import settings
@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import csv
 #get the list of images from the database
-docs = Document.objects.all()
+docs = Document.objects.filter(status="Draft").all()
 #create a unique JOB ID for this run. 
 job_id = uuid.uuid4()
 # os.mkdir("./ai_run_jobs")
@@ -121,6 +121,14 @@ for doc in docs:
             doc.status = "Draft_AI_Generated"
             doc.save()
             print(f"Document Saved {doc.id}")
+
+            #Create new Grading 
+            if doc.grading_set.count() == 0:
+
+                for gf in GradingField.objects.all():
+                    grading = Grading(grading_field=gf, document=doc)
+                    grading.value = grading.grading_field.default_value
+                    grading.save()
             for bone in bones:
                 scale = float(doc.scale)
                 rect = Rectangle(

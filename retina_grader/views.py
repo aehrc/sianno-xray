@@ -32,7 +32,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 #import django async task library for post processing upon saving
 
-from django_q.tasks import async_task
+# from django_q.tasks import async_task
 
 #Receivers
 #receives notification from a signal dispatcher that some action has taken place
@@ -40,7 +40,7 @@ from django_q.tasks import async_task
 def document_post_save(sender, instance, *args, **kwargs):
 	print("Document POST Save" , str(instance))
 
-	async_task("retina_grader.tasks.get_image_from_dicom_and_run_dfai", instance.id)
+	# async_task("retina_grader.tasks.get_image_from_dicom_and_run_dfai", instance.id)
 
 
 	if instance.grading_set.count() == 0:
@@ -230,7 +230,12 @@ def detail(request):
 				doc.status = "Reviewed"
 				doc.save()
 				#get the next document in draft
-				d = Document.objects.filter(status="Draft", allocated_to=request.user).first()
+				
+				STATUS_TEXT = "Draft"
+				if settings.DIABETIC_FOOT_AI_ENABLED == True:
+					STATUS_TEXT = "Draft_AI_Generated"
+
+				d = Document.objects.filter(status=STATUS_TEXT, allocated_to=request.user).first()
 				if d == None:
 					return HttpResponseRedirect("/sianno/" )
 				return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")

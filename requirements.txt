@@ -16,3 +16,4 @@ numpy
 pydicom
 pylibjpeg
 pylibjpeg-libjpeg
+django-q

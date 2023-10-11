@@ -187,7 +187,9 @@ function redraw_new_rect(){
 		}else{
 			global_data_foot.push({"x": x, "y": y, "width": width, "height": height,
        "annotation_type":"unknown",
-			 "active": active});
+			 "active": active,
+       "toe_number" : "" //Set an empty toe number
+      });
 			d3.select(this).remove();
 		}
 	});
