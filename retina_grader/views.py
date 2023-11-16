@@ -50,6 +50,7 @@ def document_post_save(sender, instance, *args, **kwargs):
 			grading.value = grading.grading_field.default_value
 			grading.save()
 
+	
 
 @receiver(pre_save, sender=Document)
 def document_pre_save(sender, instance, *args, **kwargs):
@@ -74,6 +75,11 @@ def document_pre_save(sender, instance, *args, **kwargs):
 
 		instance.allocated_to = user
  
+	#save the document's scale from the beginning
+	if instance.width > 1000:
+		instance.scale = instance.width / 1000
+		
+
 
 
 #Views
