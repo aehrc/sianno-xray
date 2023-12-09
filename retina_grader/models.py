@@ -220,6 +220,9 @@ class Rectangle(models.Model):
 	#firled for foot xray
 	annotation_type = models.CharField(max_length=50,null=True, blank=True, default = "unknown")
 	toe_number = models.CharField(max_length=250,null=True, blank=True, default = "unknown")
+	#field for adding osteomyelitis score
+	osteomyelitis_present_score = models.FloatField(null=True, blank=True)
+
 
 
 

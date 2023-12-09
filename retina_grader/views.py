@@ -20,6 +20,7 @@ import json
 import os
 
 
+
 from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
 # if settings.DIABETIC_FOOT_AI_ENABLED : 
 # 	from .utils_diabetic_foot_ai import *
@@ -33,6 +34,9 @@ from django.core.files.base import ContentFile
 #import django async task library for post processing upon saving
 
 # from django_q.tasks import async_task
+
+from .utils import run_osteomyelitis_detection
+
 
 #Receivers
 #receives notification from a signal dispatcher that some action has taken place
@@ -133,6 +137,9 @@ def detail(request):
 							return HttpResponseRedirect("/sianno/" )
 						return HttpResponseRedirect("/sianno/detail/?d="+str(d.id)+"")
 					#as "EXCLUDE" and save the record and then load the next record.
+
+
+					
 				for p in request.POST:
 					if p.startswith("grading_"):
 						g = Grading.objects.get(id = p.split("grading_")[1])
@@ -171,6 +178,15 @@ def detail(request):
 					"total_count" : total_count,
 					"annotation" : annotation})
 			elif request.method == "POST":
+
+				#if the foot_xray_run_osteomylitis_detection is selected, then run the Osteo detection and return OK if all ran successfully. 
+				if "foot_xray_run_osteomylitis_detection" in request.POST:
+					print("running osteo detection")
+					if run_osteomyelitis_detection(doc) : 
+						return JsonResponse({"result" : "OK"})	
+					else:
+						return JsonResponse({"result": "NOT OK"})
+					
 				if "wrist_xray" in request.POST:
 					print("updating wrist xray info")
 					wrist_xray_rects = json.loads(request.POST['wrist_xray_rects'])

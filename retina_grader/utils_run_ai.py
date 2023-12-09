@@ -345,6 +345,7 @@ for doc in docs:
 						"height": height,
 						"confidence" : confidence
 								})
+					# pass
 				
 	# check for small bone detection files
 	if os.path.exists(results_resized_txt_file):
@@ -368,13 +369,16 @@ for doc in docs:
 							"height": height,
 							"confidence" : confidence
 									})
+						# pass
 			#print(f"BONES: {bones}")
 
 	
 	print(f"Final Bone: {bones}")
 
 
-	#create a new document with the same ID 
+	#create a new document with the same ID
+	old_doc_id = doc.id #used to read the original image height in the STEP 2 small bone detector
+
 	doc.id = None
 	doc.status = "Draft_AI_Generated"
 	#Adjust the Scale if not set appropriately
@@ -391,25 +395,60 @@ for doc in docs:
 			grading = Grading(grading_field=gf, document=doc)
 			grading.value = grading.grading_field.default_value
 			grading.save()
+	#for each bones, remove any duplicates and keep only the ones with the highest confidence
 	
+
+
+
 	#For each bones, create a new rectangle and save it in the database
 
 
 
 	for bone in bones:
 		scale = float(doc.scale)
-		rect = Rectangle(
-			document = doc,
+		# If the bone is the small bone detector, then get the height of the small bone image and 
+		#use it in  the new bone.
+		if bone["toe"] in LABELS_STEP2:
+			print("Bone in STEP 2")
+			resized_image_path = os.path.join(input_resized_images_folder,f"{old_doc_id}.PNG")
+			im = Image.open(resized_image_path)
+			resized_height = im.height
+			print(f"Resized height{resized_height}, Original Height {doc.height}, Bone Height {bone['height']}, Bone Y {bone['y']}")
+			rect = Rectangle(document = doc,
 							x= int(bone["x"] * doc.width / scale ) , 
-							y = int(bone["y"] * doc.height / scale), 
+							#the Y from the results text is for the cropped image. we need to first get the height with respect to that and then add the cropped height to get the actual Y
+
+							y = int(
+								
+								((bone["y"] * resized_height) ) / scale
+								
+								), 
 							width = int(bone["width"] * doc.width / scale), 
-							height = int(bone["height"] * doc.height / scale),
+							#the height from the results text is for the cropped image. we need to first get the height with respect to that and then add the cropped height to get the actual height
+
+							height = int(
+								((bone["height"] * resized_height) ) / scale)
+								,
 							annotation_type = "Osteomyelitis",
 							toe_number  = bone["toe"]
 
 							)
 		
-		rect.save()
+			rect.save()			
+		else:
+
+			rect = Rectangle(
+				document = doc,
+								x= int(bone["x"] * doc.width / scale ) , 
+								y = int(bone["y"] * doc.height / scale), 
+								width = int(bone["width"] * doc.width / scale), 
+								height = int(bone["height"] * doc.height / scale),
+								annotation_type = "Osteomyelitis",
+								toe_number  = bone["toe"]
+
+								)
+			
+			rect.save()
 		print(f"Rect Saved {rect.id}")
 
 

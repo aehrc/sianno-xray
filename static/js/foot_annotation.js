@@ -400,11 +400,11 @@ function update(){
             if(type == "PANAROMIC"){
               return "1.0em"
             }else{
-              return "1.5em"
+              return "1.0em"
             }
           })
           .style("fill", "orange")
-          // .attr("dy", ".35em")
+          .attr("dy", "1.0em")
           // .text(d.tooth + " " + d.site + " " + d.depth)
           .text(
             
@@ -729,6 +729,38 @@ $(document).ready(function(){
   });
 
 
+ //When the Ostemyelitis detection algorithm is clicked, 
+ $("#id_btn_run_osteomyelitis_detection").click(function () {
+
+  //call osteomylitiis code in the server side and reload the page
+  var json_dict = { "foot_xray_run_osteomylitis_detection": true, };
+  //send in a HTTP POST to start the osteo detection process
+  $.ajax({
+    type: "POST",
+    url: "/sianno/detail/?d=" + document_id,
+    data: json_dict,
+    // contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success: function (data) {
+      if (data.result == "OK") {
+        alert("Run Osteo Succeeded");
+        window.location.reload(true);
+      }
+      else {
+        alert("Run Osteo Data returned is NOT OK: " + data.result);
+      }
+    },
+    error: function (req, textStatus, errorThrown) {
+      alert("Osteo Run failed" + errorThrown);
+      // console.log("why it is failing?");
+      //  window.location.reload(true);
+      console.log(JSON.stringify(errorThrown));
+    }
+  });//end of ajax post
+
+
+
+});//end of run osteo button click function
 
 
 
@@ -736,6 +768,6 @@ $(document).ready(function(){
 
 
 
-});
+});//end of document ready
 
 

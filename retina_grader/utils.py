@@ -198,3 +198,99 @@ def read_dcm_file(file,file_name):
 
 
 
+# Run the Osteomyelities Detection for a given document ID
+
+import uuid
+from pathlib import Path
+import cv2
+import subprocess
+
+
+def run_osteomyelitis_detection(document):
+	job_id = uuid.uuid4()
+	input_images_osteomyelitis = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/"
+	cropped_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/"
+	results_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/results"
+	OSTEO_PYTHON_PATH = "/Users/vig00a/code/sianno-xray-github/Yolov7_deployment/yolov7/venv_yolo7/bin/python"
+
+	Path(input_images_osteomyelitis).mkdir(parents=True,exist_ok=True)
+	Path(cropped_rect_osteomyelitis_images).mkdir(parents=True,exist_ok=True)
+	Path(results_rect_osteomyelitis_images).mkdir(parents=True,exist_ok=True)
+
+	#First get the document's PNG
+	doc_path = document.document.path
+
+
+
+	im = None
+
+	if document.document.name.endswith(".dcm"):
+		#read the file as memory file and return as image. 
+		ds = dcmread (settings.MEDIA_ROOT+ "/" + str(document.document))
+		image_2d = ds.pixel_array.astype(float)
+		image_2d_scaled = (np.maximum(image_2d,0) / image_2d.max()) * 255.0
+		image_2d_scaled = np.uint8(image_2d_scaled)
+		format = "PNG"
+		# image_byte = io.BytesIO()
+		file_name = f"{input_images_osteomyelitis}{document.id}.{format}"
+
+		im = Image.fromarray(image_2d_scaled).convert("L").save(file_name, format=format)
+		im = Image.open(file_name)
+
+	print("Ran the Osteo Detection ")
+
+	rectangles = Rectangle.objects.filter(document = document)
+	scale = float(document.scale)
+
+	for rect in rectangles:
+		try:
+			
+			print(f"rect x,y {rect.x},{rect.y}, W, H { rect.width}, {rect.height} Scale: {document.scale}")
+			rect_left = rect.x * scale
+			rect_top = rect.y * scale
+			rect_right = (rect.x + rect.width) * scale
+			rect_bottom = (rect.y + rect.height) * scale
+
+
+
+			
+			im1 = im.crop((rect_left,rect_top, rect_right, rect_bottom))
+
+			im1.save(f'{cropped_rect_osteomyelitis_images}{rect.id}.png', format="PNG")
+
+		except Exception as ex:
+			print(str(ex))
+
+
+
+	#  Run the Osteo Detection on the input folder.#################
+
+
+	subprocess.run([OSTEO_PYTHON_PATH, "run_osteo.py",
+				"--source",
+				f"{cropped_rect_osteomyelitis_images}",
+					"--ouput",
+				f"{results_rect_osteomyelitis_images}",
+				 ], 
+				 cwd="/Users/vig00a/code/sianno-xray-github/Yolov7_deployment/yolov7") 
+
+
+
+	############## once the process has run successfully. read the results text from the file and load the rectangles
+
+	results_file_name = f'{results_rect_osteomyelitis_images}results.txt'
+	results = json.loads(open(results_file_name).read())
+	#we assume that the results is stored in the following format: 
+	for result in results:
+		rect_id = result["rect_id"]
+		score = result["score"]
+		rect = Rectangle.objects.get(id = rect_id)
+		rect.osteomyelitis_present_score = score
+		rect.save()
+
+
+
+
+
+	return True
+
