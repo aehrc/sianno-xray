@@ -8,7 +8,7 @@ import pydicom
 import numpy as np
 
 from PIL import Image
-
+import json
 import os
 class VGG_net(nn.Module):
     
@@ -67,28 +67,50 @@ print(f"Output folder: {args.output_folder}")
 # im = (im - np.min(im)) / (np.max(im) - np.min(im))
 
 direct = r'/Users/vig00a/code/sianno-xray-github/df_osteo_detection_program/dfo_vgg16_weights.pt'
-model = VGG_net()
-x = torch.load(direct, map_location=torch.device('cpu'))
+model = VGG_net().to(device="cpu")
+x = torch.load(direct
+               , map_location=torch.device('cpu')
+               )
+print("loaded the osteo model")
 model.load_state_dict(x)
 model.train(False)
 
 m=nn.Sigmoid()
+results = []
 
 for filename in os.listdir(args.source):
+    print(f"for file name {filename}")
     if filename.lower().endswith(".jpg") or filename.lower().endswith(".png"):
         image_path = os.path.join(args.source, filename)
         with open(image_path, 'rb') as f:
             image = Image.open(f)
-            image_array = np.asarray(image)
+            image_resized = image.resize((224, 224))
+
+            image_array = np.asarray(image_resized)
             image_array = (image_array - np.min(image_array)) / (np.max(image_array) - np.min(image_array))
+            image_array = np.stack((image_array,)*3, axis=0)
+
             # image = torch.from_numpy(image).to(device='cuda', dtype=torch.float32)
-            image = torch.from_numpy(image_array).to(device='cpu',dtype=torch.float32)
-            image = torch.unsqueeze(image, 0)
-            output = model(image)
+            image_np = torch.from_numpy(image_array).to(device='cpu',dtype=torch.float32)
+            print(f"shape of image_np {image_np.shape} ")
+
+            image_np = torch.unsqueeze(image_np, 0)
+            print(f"shape of image_np after squeeze {image_np.shape} ")
+
+            print("about to predict")
+            output = model(image_np)
+            print("predicted")
+
             output = m(output)
             #output = [int(value > 0.5) for value in output]
             print({'prediction': output.detach().item()})
+            results.append({"rect_id" : filename.split(".")[0],
+                            "osteomyelitis_present_score" : float(output.detach().item()) })
+
+#write the results to the results.txt file
             
+with open(os.path.join(args.output_folder,"results.txt"), "w") as f:
+    f.write(json.dumps(results))
 
 
 

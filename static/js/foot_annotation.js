@@ -22,6 +22,10 @@ var MIN_RECT_HEIGHT = 10;
 
 var global_data_foot = []; //global variable to store the rectanglel data
 
+var osteomyelitis_present_score_visualisation = false;//osteomyelitis_present_score_visualisation handles the visualisation of the detected osteo  scores
+
+
+
 //select div container with id of imageBody-wx, add it to SVG with width and height adjusted
 var svg = d3.select("#imageBody-FX").append("svg")
   .attr("width", width/scale)
@@ -332,6 +336,12 @@ function update(){
       .style("opacity", 0.4)
       .attr("stroke", "blue")
       .attr("stroke-width", 3)
+
+      .attr('fill', function(d){
+
+        return osteomyelitis_present_score_visualisation ?  'rgb(' + Math.floor((d.osteomyelitis_present_score * 255)/100)  + ',0,0)' : null 
+      } )
+
       .call(d3.drag()
         .container(g_foot.node())
         .on("start end", rectMoveStartEnd)
@@ -400,7 +410,7 @@ function update(){
             if(type == "PANAROMIC"){
               return "1.0em"
             }else{
-              return "1.0em"
+              return "0.5em"
             }
           })
           .style("fill", "orange")
@@ -412,7 +422,7 @@ function update(){
             //If Ostemyletitis, then return the toe number
             if (d.annotation_type == "Osteomyelitis")
             {
-            return d.toe_number.toString();
+            return d.toe_number.toString() + " - DF:" + d.osteomyelitis_present_score.toString() + "%";
             }
             else
             {
@@ -765,6 +775,15 @@ $(document).ready(function(){
 
 
 
+//Key Down Event for the SVG
+svg.on("keydown", function(){
+	if(d3.event.key == "d" ){
+    // alert("d pressed");
+    osteomyelitis_present_score_visualisation = !osteomyelitis_present_score_visualisation;
+    update();
+  }
+
+});
 
 
 

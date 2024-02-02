@@ -91,6 +91,7 @@ def get_rect_info(doc):
 		#  "view_type" : item.view_type,
 		 "annotation_type": item.annotation_type,
 		 "toe_number": item.toe_number,
+		 "osteomyelitis_present_score": round(item.osteomyelitis_present_score * 100)
 		 })
 	return rects
 
@@ -211,7 +212,7 @@ def run_osteomyelitis_detection(document):
 	input_images_osteomyelitis = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/"
 	cropped_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/"
 	results_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/results"
-	OSTEO_PYTHON_PATH = "/Users/vig00a/code/sianno-xray-github/Yolov7_deployment/yolov7/venv_yolo7/bin/python"
+	OSTEO_PYTHON_PATH = "/Users/vig00a/code/sianno-xray-github/df_osteo_detection_program/venv-df-osteo/bin/python"
 
 	Path(input_images_osteomyelitis).mkdir(parents=True,exist_ok=True)
 	Path(cropped_rect_osteomyelitis_images).mkdir(parents=True,exist_ok=True)
@@ -237,7 +238,6 @@ def run_osteomyelitis_detection(document):
 		im = Image.fromarray(image_2d_scaled).convert("L").save(file_name, format=format)
 		im = Image.open(file_name)
 
-	print("Ran the Osteo Detection ")
 
 	rectangles = Rectangle.objects.filter(document = document)
 	scale = float(document.scale)
@@ -254,9 +254,28 @@ def run_osteomyelitis_detection(document):
 
 
 			
-			im1 = im.crop((rect_left,rect_top, rect_right, rect_bottom))
+			# im1 = im.crop((rect_left,rect_top, rect_right, rect_bottom))
 
+			# im1.save(f'{cropped_rect_osteomyelitis_images}{rect.id}.png', format="PNG")
+
+
+			#Crop 224x224 image 
+			#get the center x and y 
+			rect_center_x = (rect.x +  (rect.width)/2)* scale
+			rect_center_y = (rect.y +  (rect.height)/2)* scale
+			#now get the 224x224 rect coordinates
+			cropped_rect_left = round(rect_center_x - (224/2))
+			cropped_rect_top = round(rect_center_y - (224/2))
+			cropped_rect_right = round(rect_center_x + (224/2))
+			cropped_rect_bottom = round(rect_center_y + (224/2))
+			im1 = im.crop((cropped_rect_left,cropped_rect_top, cropped_rect_right, cropped_rect_bottom))
 			im1.save(f'{cropped_rect_osteomyelitis_images}{rect.id}.png', format="PNG")
+			print(f"saved cropped rectangle left, top, right, bottom {cropped_rect_left}, {cropped_rect_top}, {cropped_rect_right}, {cropped_rect_bottom}")
+
+
+			#if the width and height is greater than 224, then resize
+			#left off here
+
 
 		except Exception as ex:
 			print(str(ex))
@@ -265,29 +284,34 @@ def run_osteomyelitis_detection(document):
 
 	#  Run the Osteo Detection on the input folder.#################
 
-
+	CWD = "/Users/vig00a/code/sianno-xray-github/retina_grader"
 	subprocess.run([OSTEO_PYTHON_PATH, "run_osteo.py",
 				"--source",
 				f"{cropped_rect_osteomyelitis_images}",
-					"--ouput",
+					"--output_folder",
 				f"{results_rect_osteomyelitis_images}",
 				 ], 
-				 cwd="/Users/vig00a/code/sianno-xray-github/Yolov7_deployment/yolov7") 
+				 cwd=CWD) 
 
+	print("Ran the Osteo Detection ")
 
 
 	############## once the process has run successfully. read the results text from the file and load the rectangles
 
-	results_file_name = f'{results_rect_osteomyelitis_images}results.txt'
+	results_file_name = f'{results_rect_osteomyelitis_images}/results.txt'
+	print(f"results file name: {results_file_name}")
 	results = json.loads(open(results_file_name).read())
+	print(f"results : {results}")
+
 	#we assume that the results is stored in the following format: 
 	for result in results:
 		rect_id = result["rect_id"]
-		score = result["score"]
+		osteomyelitis_present_score = result["osteomyelitis_present_score"]
 		rect = Rectangle.objects.get(id = rect_id)
-		rect.osteomyelitis_present_score = score
+		print("got the rect to be saved, updating scores")
+		rect.osteomyelitis_present_score = osteomyelitis_present_score
 		rect.save()
-
+		print(f"rectangle updated with score RectID { rect_id}, Score {osteomyelitis_present_score}")	
 
 
 
