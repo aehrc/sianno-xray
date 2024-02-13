@@ -848,16 +848,63 @@ $(document).ready(function(){
 //   // }
   document.addEventListener("keydown", (event) => {
     if(event.key == "d" ){
+          
           osteomyelitis_present_score_visualisation = !osteomyelitis_present_score_visualisation;
+          check_info_label_status();
+          
+
           update();
         }  
       
         if(event.key == "r" ){
           draw_rectangle_toggle = !draw_rectangle_toggle;
+          check_info_label_status();
+
         }
       
       });
-
       
+//function to update the text of the label at the top which provides user hints
+      function check_info_label_status(){
+
+
+        if (osteomyelitis_present_score_visualisation_feature_enabled)
+        {
+          if (osteomyelitis_present_score_visualisation && draw_rectangle_toggle ){
+            $("#id-label-ui-info").html("Drawing new Bones and Displaying All Bones, Press d key again to show only osteo bones, Press r key to end bone drawing");
+          }
+          else if (osteomyelitis_present_score_visualisation && !draw_rectangle_toggle )
+          {
+            $("#id-label-ui-info").html("Displaying All Bones, Press d key again to show only osteo bones, Press r key to draw new bones");
+
+          }
+          else if (!osteomyelitis_present_score_visualisation && draw_rectangle_toggle )
+          {
+            $("#id-label-ui-info").html("Drawing new Bones and Displaying Osteo Bones, Press d key again to show all bones, Press r key to end bone drawing");
+
+          }
+          else if (!osteomyelitis_present_score_visualisation && !draw_rectangle_toggle )
+          {
+            $("#id-label-ui-info").html("Displaying Osteo Bones, Press d key to show all bones, Press r key to draw new bone");
+
+          }
+          
+        }
+        else
+        {
+          if (draw_rectangle_toggle ){
+            $("#id-label-ui-info").html("Displaying All Bones. Press r key to end bone drawing");
+        }
+        else
+        {
+          $("#id-label-ui-info").html("Displaying All Bones. Press r key to draw new bones");
+          
+
+        }
+
+      }
+    }//end of function check_info_label_status
+      
+      check_info_label_status();
 
 });//end of document ready
