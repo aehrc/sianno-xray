@@ -17,4 +17,5 @@ pydicom
 pylibjpeg
 pylibjpeg-libjpeg
 django-q
-opencv-python
+opencv-python-headless
+python-dotenv

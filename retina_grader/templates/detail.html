@@ -19,9 +19,22 @@
     // url = "/media/{{ doc.document.name }}";
     url = "/sianno/get_image/?document_id={{ doc.id }}";
     document_id = "{{ doc.id }}";
+    osteomyelitis_present_score_visualisation_feature_enabled = false;//additional visualisation feature for osteo detection. Disabled by default so that all the data is viewable. If enabled, user has to press d key to show all the rectangles. else, it will show only the ones above 50%
+    var osteomyelitis_present_score_visualisation = false;//osteomyelitis_present_score_visualisation handles the visualisation of the detected osteo  scores
+
+
 
   // var this_page = "{{this_page}}";
 </script>
+{% if user.username == "osteo_labeler1" %}
+<script>
+osteomyelitis_present_score_visualisation_feature_enabled = true;
+osteomyelitis_present_score_visualisation = true;
+
+
+</script>
+{% endif %}
+
 {% if annotation == "rect-foot" %}
 <script src="/static/js/d3.v4.min.js"></script>
 {% elif annotation == "poly" %}
@@ -30,7 +43,6 @@
 <script src="https://cdn.jsdelivr.net/d3js/3.5.9/d3.min.js"></script>
 {% endif %}
 <body style="background-color: black; color: white">
- 
   <nav class="navbar navbar-expand navbar-light bg-light">
     <a class="navbar-brand" href="/sianno/">
         <img src="{% static 'images/CSIRO_logo.png' %}" width="30" height="30" alt="">
@@ -39,7 +51,7 @@
     </a>
 
 
-    <span  class="navbar-text">Image Review Progress: {{ completed_count }} of {{ total_count }} Image(s)</span>
+    <span  class="navbar-text">Image Review Progress for {{user.username}}: {{ completed_count }} of {{ total_count }} Image(s)</span>
     
     <span class="navbar-text"><progress value="{{ completed_count }}" max="{{ total_count }}"> </progress></span>
     
@@ -63,6 +75,9 @@
 
             <button type="button" class="dropdown-item" id="btn_upload">
                 <span class="oi oi-cloud-upload"></span> Upload </button>
+              <button type="button" class="dropdown-item" id="btn_detect_bones">
+                  <span class="oi oi-cpu"></span> Detect Bones on Draft </button>
+                  
             {% endif %}
             <a class="dropdown-item" href="/accounts/logout/?next=/sianno/"> <span
                     class="oi oi-account-logout"></span> Logout </a>
@@ -105,24 +120,26 @@
 </button>
 {% endif %} -->
 
+<div class="row">
+
+
+
+
 {% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
 
-{% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
+
 <label>Accession Number: {{doc.accession_no}}</label>  
 <label>View Type: {{ doc.view_position}}</label>
 
-<div class="container-fluid" id="imageBody-WX">
+<div class="col-sm-9" id="imageBody-WX">
     
 </div>
 {% endif %}
 
 {% if doc.purpose == "GRADING" and doc.type == "FOOT-XRAY" %}
 
-{% comment %} <label class="lbl lbl-primary">UMRN: {{doc.patient_id}}</label> {% endcomment %}
-<!-- <label>Accession Number: {{doc.accession_no}}</label>  
-<label>View Type: {{ doc.view_position}}</label> -->
 
-<div class="container-fluid" id="imageBody-FX">
+<div class="col-sm-9"  id="imageBody-FX">
     
 </div>
 {% endif %}
@@ -130,24 +147,28 @@
 <br>
 
 {% if doc.purpose == "GRADING" and doc.type == "WRIST-XRAY" %}
-<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 300px; color: black; padding:10px"> 
-  <form method="post" id="form-wrist-xray-grading" >
-    {% csrf_token %}
-    <input type="hidden" name="save_next_wrist_xray" value="yes">
-    <label class="btn btn-danger">
-      <input type="checkbox" name= "exclude_accession_number"/>
-        Exclude this Accession Number
-    </label>
-<label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
-    <button type="button" id="id_btn_save_next" class="btn btn-primary float-right">Save & Next</button>
-    </form>
+<div class="col-sm-3 card text-left" > 
+  <div class="card-body">
+    <form method="post" id="form-wrist-xray-grading" >
+      {% csrf_token %}
+      <input type="hidden" name="save_next_wrist_xray" value="yes">
+      <label class="btn btn-danger">
+        <input type="checkbox" name= "exclude_accession_number"/>
+          Exclude this Accession Number
+      </label>
+  <label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
+      <button type="button" id="id_btn_save_next" class="btn btn-primary float-right">Save & Next</button>
+      </form>
+  </div>
+ 
 </div>
 
 {% endif %}
 
 {% if doc.purpose == "GRADING" and doc.type == "FOOT-XRAY" %}
-<div class="card text-left" style="position: absolute; right: 50px; top: 100px ; width: 400px; color: black; padding:10px"> 
+<div class="col-sm-3 card text-left" style="color: black; padding:10px"> 
   
+  <div class="card-body">
 
   
   <form method="post" id="form-next-foot-grading" class="form" >
@@ -211,17 +232,19 @@
 <label>Click Save & Next to go to next image. Rectangles and annotation data are automatically saved.</label>
     <br>
     <br>
-    <button type="button" id="id_btn_run_osteomyelitis_detection" class="btn btn-warning float-right">Detect Osteomyelitis</button>
+    <!-- <button type="button" id="id_btn_run_osteomyelitis_detection" class="btn btn-warning float-right">Detect Osteomyelitis</button>
     <br>
-    <br>    
+    <br>     -->
     <button type="button" id="id_btn_save_next_foot" class="btn btn-primary float-right">Save & Next</button>
     
 
     </form>
+    </div>
 </div>
 
 {% endif %}
 
+</div>
 <div class="container-fluid">
       <div class="row">
         {% include "modals/wrist_xray_modal.html" %}

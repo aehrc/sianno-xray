@@ -209,10 +209,23 @@ import subprocess
 
 def run_osteomyelitis_detection(document):
 	job_id = uuid.uuid4()
-	input_images_osteomyelitis = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/"
-	cropped_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/"
-	results_rect_osteomyelitis_images = f"/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/job_id_{job_id}/cropped_images/results"
+
+	OSTEO_WORKING_PATH = "/Users/vig00a/code/sianno-xray-github/ai_run_jobs/osteo/"
 	OSTEO_PYTHON_PATH = "/Users/vig00a/code/sianno-xray-github/df_osteo_detection_program/venv-df-osteo/bin/python"
+
+	if os.getenv('OSTEO_WORKING_PATH'):
+		OSTEO_WORKING_PATH = os.environ.get('OSTEO_WORKING_PATH')
+
+	if os.getenv('OSTEO_PYTHON_PATH'):
+		OSTEO_PYTHON_PATH = os.environ.get('OSTEO_PYTHON_PATH')
+
+	CONFIDENCE_THRESHOLD = 0.5
+	if os.getenv('OSTEO_DETECTION_CONFIDENCE_THRESHOLD'):
+		CONFIDENCE_THRESHOLD = float(os.environ.get('OSTEO_DETECTION_CONFIDENCE_THRESHOLD'))
+
+	input_images_osteomyelitis = f"{OSTEO_WORKING_PATH}job_id_{job_id}/"
+	cropped_rect_osteomyelitis_images = f"{OSTEO_WORKING_PATH}job_id_{job_id}/cropped_images/"
+	results_rect_osteomyelitis_images = f"{OSTEO_WORKING_PATH}job_id_{job_id}/cropped_images/results"
 
 	Path(input_images_osteomyelitis).mkdir(parents=True,exist_ok=True)
 	Path(cropped_rect_osteomyelitis_images).mkdir(parents=True,exist_ok=True)
@@ -284,14 +297,17 @@ def run_osteomyelitis_detection(document):
 
 	#  Run the Osteo Detection on the input folder.#################
 
-	CWD = "/Users/vig00a/code/sianno-xray-github/retina_grader"
+	DJANO_WORKING_DIRECTORY = "/Users/vig00a/code/sianno-xray-github/retina_grader"
+	if os.getenv('DJANO_WORKING_DIRECTORY'):
+		DJANO_WORKING_DIRECTORY = os.environ.get('DJANO_WORKING_DIRECTORY')
+
 	subprocess.run([OSTEO_PYTHON_PATH, "run_osteo.py",
 				"--source",
 				f"{cropped_rect_osteomyelitis_images}",
 					"--output_folder",
 				f"{results_rect_osteomyelitis_images}",
 				 ], 
-				 cwd=CWD) 
+				 cwd=DJANO_WORKING_DIRECTORY) 
 
 	print("Ran the Osteo Detection ")
 
@@ -305,16 +321,72 @@ def run_osteomyelitis_detection(document):
 
 	#we assume that the results is stored in the following format: 
 	for result in results:
-		rect_id = result["rect_id"]
-		osteomyelitis_present_score = result["osteomyelitis_present_score"]
-		rect = Rectangle.objects.get(id = rect_id)
-		print("got the rect to be saved, updating scores")
-		rect.osteomyelitis_present_score = osteomyelitis_present_score
-		rect.save()
-		print(f"rectangle updated with score RectID { rect_id}, Score {osteomyelitis_present_score}")	
+		if result["osteomyelitis_present_score"] >= CONFIDENCE_THRESHOLD:
+			rect_id = result["rect_id"]
+			osteomyelitis_present_score = result["osteomyelitis_present_score"]
+			rect = Rectangle.objects.get(id = rect_id)
+			print("got the rect to be saved, updating scores")
+			rect.osteomyelitis_present_score = osteomyelitis_present_score
+			rect.save()
+			print(f"rectangle updated with score RectID { rect_id}, Score {osteomyelitis_present_score}")	
 
 
 
 
 	return True
 
+def create_new_documents_for_osteomyelitis():
+	try:
+
+		#get the new allocated to user
+		user1 = User.objects.get(username="bone_labeler1")
+		user2 = User.objects.get(username="osteo_labeler1")
+		#get the documents where the labeler1 has finished the bone labelling
+
+		docs = Document.objects.filter(status="Reviewed", 
+									allocated_to = user1 
+									)
+
+		for doc in docs:
+			bones = Rectangle.objects.filter(document = doc)
+			doc.id = None
+			doc.status = "Draft_Osteo_Detected"
+			doc.allocated_to = user2
+			#Adjust the Scale if not set appropriately
+			if doc.width > 1000:
+				doc.scale = doc.width / 1000
+
+			doc.save()
+			print(f"Document Saved {doc.id}")
+
+			#Create new Grading 
+			if doc.grading_set.count() == 0:
+
+				for gf in GradingField.objects.all():
+					grading = Grading(grading_field=gf, document=doc)
+					grading.value = grading.grading_field.default_value
+					grading.save()
+			#for each bones, remove any duplicates and keep only the ones with the highest confidence
+			
+
+
+
+			#For each bones, create a new rectangle and save it in the database
+			for bone in bones:
+				bone.id = None
+				bone.document = doc
+				bone.save()
+
+
+		#now for each document for user2 in draft, run the osteo detection algorithm
+		docs = Document.objects.filter(status="Draft_Osteo_Detected", 
+									allocated_to = user2 
+									)
+		
+		for doc in docs:
+			run_osteomyelitis_detection(doc)
+		
+		return True
+	except Exception as ex:
+		print(f"Error in osteo detection {str(ex)}")
+		return False

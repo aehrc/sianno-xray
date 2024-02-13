@@ -18,3 +18,4 @@ ai_run_jobs
 image_registration
 document_tray
 df_osteo_detection_program
+docker_volume

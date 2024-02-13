@@ -54,6 +54,10 @@
 
                 <button type="button" class="dropdown-item" id="btn_upload">
                     <span class="oi oi-cloud-upload"></span> Upload </button>
+                    <button type="button" class="dropdown-item" id="btn_detect_bones">
+                        <span class="oi oi-eye"></span> Detect Bones on Draft </button>
+                        <button type="button" class="dropdown-item" id="btn_detect_osteo">
+                            <span class="oi oi-eye"></span> Detect Osteo </button>
                 {% endif %}
                 <a class="dropdown-item" href="/accounts/logout/?next=/sianno/"> <span
                         class="oi oi-account-logout"></span> Logout </a>
@@ -135,7 +139,10 @@
       <a class="nav-link" data-toggle="tab" href="#reviewed_content">Reviewed</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#draft_ai_generated">Drafts_AI_Generated</a>
+        <a class="nav-link" data-toggle="tab" href="#draft_bone_detected">Draft_Bone_Detected</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#draft_osteo_detected">Draft_Osteo_Detected</a>
       </li>
   </ul>
 
@@ -149,9 +156,11 @@
     <div class="tab-pane fade" id = "reviewed_content"><div id= "id_table_worklist_reviewed"  > </div>
         </div>
 
-    <div class="tab-pane fade" id = "draft_ai_generated"> <div id= "id_table_draft_ai_generated"  ></div>
+    <div class="tab-pane fade" id = "draft_bone_detected"> <div id= "id_table_draft_bone_detected"  ></div>
         </div>
 
+        <div class="tab-pane fade" id = "draft_osteo_detected"> <div id= "id_table_draft_osteo_detected"  ></div>
+    </div>
     
         </div> 
     </div>

@@ -65,10 +65,11 @@ print(f"Output folder: {args.output_folder}")
 # im  =  pydicom.dcmread(r'/home/radiology/Downloads/C7895578-1-0-f43a82ac-4393f374-946b775e-fbf5e5b2-90334078.dcm')
 # im  = im.pixel_array
 # im = (im - np.min(im)) / (np.max(im) - np.min(im))
-
-direct = r'/Users/vig00a/code/sianno-xray-github/df_osteo_detection_program/dfo_vgg16_weights.pt'
+dfo_vgg16_weights_path = r'/Users/vig00a/code/sianno-xray-github/df_osteo_detection_program/dfo_vgg16_weights.pt'
+if os.getenv('dfo_vgg16_weights_path'):
+    dfo_vgg16_weights_path = os.environ.get('dfo_vgg16_weights_path')
 model = VGG_net().to(device="cpu")
-x = torch.load(direct
+x = torch.load(dfo_vgg16_weights_path
                , map_location=torch.device('cpu')
                )
 print("loaded the osteo model")

@@ -18,10 +18,10 @@ import csv
 import json
 
 import os
+from .utils_run_ai import *
 
 
-
-from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs
+from .utils import save_polygon_info, save_rect_info, save_foot_rect_info, write_docs, read_dcm_file, write_polygon_docs, create_new_documents_for_osteomyelitis
 # if settings.DIABETIC_FOOT_AI_ENABLED : 
 # 	from .utils_diabetic_foot_ai import *
 
@@ -254,8 +254,14 @@ def detail(request):
 				#get the next document in draft
 				
 				STATUS_TEXT = "Draft"
+
 				if settings.DIABETIC_FOOT_AI_ENABLED == True:
-					STATUS_TEXT = "Draft_AI_Generated"
+					#for bone labler, we return the next draft bone detected document
+					if doc.allocated_to.username == "bone_labeler1":
+						STATUS_TEXT = "Draft_Bone_Detected"
+					elif doc.allocated_to.username == "osteo_labeler1":
+						STATUS_TEXT = "Draft_Osteo_Detected"
+
 
 				d = Document.objects.filter(status=STATUS_TEXT, allocated_to=request.user).first()
 				if d == None:
@@ -528,3 +534,32 @@ def get_image(request):
 			print (e)
 			response = HttpResponse("file error")
 			return response
+#when detect function is called, run bone detector for all the draft records		
+@login_required()
+def detect_bones(request):
+	try:
+		run_small_big_bone_detection()
+
+		print("Detection algorithm was run successfully")
+		return JsonResponse({"result":"OK"})
+	except Exception as ex:
+
+		return JsonResponse({"result": f"error: {ex}"})
+
+#when detect function is called, run osteo detector for all the Completed records from the user "labler_bone"		
+@login_required()
+def detect_osteo(request):
+	try:
+		
+		
+		if create_new_documents_for_osteomyelitis() == True:
+
+
+			print("Detection algorithm was run successfully")
+			return JsonResponse({"result":"OK"})
+		else:
+			return JsonResponse({"result": "Program issue"})
+	except Exception as ex:
+
+		return JsonResponse({"result": f"error: {ex}"})
+

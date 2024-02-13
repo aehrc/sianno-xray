@@ -21,8 +21,7 @@ var MIN_RECT_HEIGHT = 10;
 
 
 var global_data_foot = []; //global variable to store the rectanglel data
-
-var osteomyelitis_present_score_visualisation = false;//osteomyelitis_present_score_visualisation handles the visualisation of the detected osteo  scores
+var draw_rectangle_toggle = false;//global variable which toggles the rectangle draw function
 
 
 
@@ -30,6 +29,8 @@ var osteomyelitis_present_score_visualisation = false;//osteomyelitis_present_sc
 var svg = d3.select("#imageBody-FX").append("svg")
   .attr("width", width/scale)
   .attr("height", height/scale);
+  // .attr("width",600)
+  // .attr("height", 600);
 
   //get text annotation
 var text = svg.selectAll("text");
@@ -109,8 +110,8 @@ var img = g_foot.append("svg:image")
 
 //draw a rectangle on the image when clicked
 function mousedown() {
-//create rectangles only using the middle mouse button (which enables the mouse drag on primary click)
-if (d3.event.button === 1)
+//create rectangles only using the rectangle toggle (by pressing r key)
+if (draw_rectangle_toggle == true)
 {
   d3.event.stopPropagation();
   
@@ -205,20 +206,32 @@ var zoom_d = d3.zoom()
 //   return (d3.event.button === 0 ||
 //           d3.event.button === 1);
 // })
-  .scaleExtent([1, 10])
-  .on("zoom", zoom_foot);
+  .scaleExtent([0.5, 10])
+  .on("zoom", zoom_foot)
+  .filter(function(){
+    return (event.button === 0 ||
+            event.button === 1);
+  })
+  ;
 
 
 function zoom_foot() {
   // console.log("zoom foot")
-  g_foot.attr('transform', 'translate(' + d3.event.transform.x + ',' + d3.event.transform.y + ') scale(' + d3.event.transform.k + ')');
+  // g_foot.attr('transform', 'translate(' + d3.event.transform.x + ',' + d3.event.transform.y + ') scale(' + d3.event.transform.k + ')');
+  
   //  text.attr("transform","scale(" + d3.event.transform.scale().x + " " + d3.event.transform.scae().y + ")");
+
+  g_foot.attr("transform", d3.event.transform);
+  // gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+  // gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+
 }
 
-g_foot.call(zoom_d);
+
+svg.call(zoom_d);//zoom needs to be called on SVG and not the G element. otherwise it flickers. 
 
 // DISABLE double click for zoom
-g_foot.on("dblclick.zoom", null);
+svg.on("dblclick.zoom", null);
  
 // update();
 
@@ -226,8 +239,7 @@ g_foot.on("dblclick.zoom", null);
 function resizerHover() {
   // console.log("resizeHover");
   var el = d3.select(this), isEntering = d3.event.type === "mouseenter";
-  el
-    .classed("hovering", isEntering)
+  el.classed("hovering", isEntering)
     .attr(
       "r",
       isEntering || el.classed("resizing") ?
@@ -325,7 +337,40 @@ function update(){
     var newRects =
       rects.enter()
         .append("g")
+        .attr("visibility", function(d){
+
+          //first check if the osteomyelitis_present_score_visualisation_enabled is true, if yes, then check for further keyboard togge. If not then display everything
+          if (osteomyelitis_present_score_visualisation_feature_enabled == true)
+          {
+            // console.log(d.osteomyelitis_present_score)
+
+            if (osteomyelitis_present_score_visualisation == true && "osteomyelitis_present_score" in d)
+            {
+                //if the toggle is on, then show only the ones with the score.
+                if (parseInt(d.osteomyelitis_present_score) >= 50 ){
+                  return "visible"; 
+                }
+                else
+                {
+                  return "hidden";
+                } 
+            }
+            else//if toggle is off, then show everything. 
+            {
+              return "visible";
+            }
+
+          }
+          else//if the feature is disabled then show everything
+          {
+            return "visible";
+          }
+  
+      
+         } )
+  
         .classed("rectangle", true);
+        
       
       
     
@@ -336,11 +381,21 @@ function update(){
       .style("opacity", 0.4)
       .attr("stroke", "blue")
       .attr("stroke-width", 3)
+      // show rectangles which has above the osteo percentage 50%
 
-      .attr('fill', function(d){
+      
+      // .attr('fill', function(d){
+      //   if (d.osteomyelitis_present_score){
+      //     return osteomyelitis_present_score_visualisation ?  'rgb(' + Math.floor((d.osteomyelitis_present_score * 255)/100)  + ',0,0)' : null 
 
-        return osteomyelitis_present_score_visualisation ?  'rgb(' + Math.floor((d.osteomyelitis_present_score * 255)/100)  + ',0,0)' : null 
-      } )
+      //   }
+      //   else
+      //   {
+      //     return null;
+
+      //   }
+
+      // } )
 
       .call(d3.drag()
         .container(g_foot.node())
@@ -408,9 +463,9 @@ function update(){
           .classed("toothN", true)
           .style("font-size", function(){
             if(type == "PANAROMIC"){
-              return "1.0em"
+              return "1.5em"
             }else{
-              return "0.5em"
+              return "1.5em"
             }
           })
           .style("fill", "orange")
@@ -422,7 +477,15 @@ function update(){
             //If Ostemyletitis, then return the toe number
             if (d.annotation_type == "Osteomyelitis")
             {
-            return d.toe_number.toString() + " - DF:" + d.osteomyelitis_present_score.toString() + "%";
+              if (d.osteomyelitis_present_score){
+                return d.toe_number.toString() + " - DF:" + d.osteomyelitis_present_score.toString() + "%";
+              }
+              else
+              {
+                return d.toe_number.toString();
+              }
+
+            
             }
             else
             {
@@ -775,18 +838,26 @@ $(document).ready(function(){
 
 
 
-//Key Down Event for the SVG
-svg.on("keydown", function(){
-	if(d3.event.key == "d" ){
-    // alert("d pressed");
-    osteomyelitis_present_score_visualisation = !osteomyelitis_present_score_visualisation;
-    update();
-  }
+// //Key Down Event for the SVG
+// document.on("keydown", function(event){
+//   alert(event);
+// 	// if(d3.event.key == "d" ){
+//   //   // alert("d pressed");
+//   //   osteomyelitis_present_score_visualisation = !osteomyelitis_present_score_visualisation;
+//   //   update();
+//   // }
+  document.addEventListener("keydown", (event) => {
+    if(event.key == "d" ){
+          osteomyelitis_present_score_visualisation = !osteomyelitis_present_score_visualisation;
+          update();
+        }  
+      
+        if(event.key == "r" ){
+          draw_rectangle_toggle = !draw_rectangle_toggle;
+        }
+      
+      });
 
-});
-
-
+      
 
 });//end of document ready
-
-

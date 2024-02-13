@@ -10,4 +10,7 @@ urlpatterns = [
 	path('data_export/', views.data_export, name='data_export'),
     path('new_files/', views.new_files, name='new_files'),
     path('get_image/', views.get_image, name='get_image'),
+	path('detect_bones/', views.detect_bones, name='detect_bones'),
+	path('detect_osteo/', views.detect_osteo, name='detect_osteo'),
+
 ]

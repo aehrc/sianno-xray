@@ -1,0 +1,20 @@
+version: '3'
+services:
+
+
+
+
+#web service which runs the gunicorn service to run the django server.
+
+  web:
+    restart: always
+    build: .
+    command: bash -c "/code/venv/bin/python manage.py runserver 0.0.0.0:8000 --settings=simple_grader.settings_docker_vm"
+    volumes:
+      - ./docker_volume:/code_volume
+    ports:
+      - "9000:8000"
+  
+
+    
+    
