@@ -202,15 +202,19 @@ function redraw_new_rect(){
 }
 
 var zoom_d = d3.zoom()
-// .filter(function(){
-//   return (d3.event.button === 0 ||
-//           d3.event.button === 1);
-// })
   .scaleExtent([0.5, 10])
   .on("zoom", zoom_foot)
   .filter(function(){
-    return (event.button === 0 ||
-            event.button === 1);
+  //pan only when using the middle button
+    console.log(event);
+    if (event.button === 0 && event.buttons === 1)
+    {return false;}
+    
+    return (
+      
+      event.button === 0 ||
+            event.button === 1
+            );
   })
   ;
 
@@ -577,6 +581,11 @@ function get_foot_rects(){
   toe_number = "";
 
 	g_foot.selectAll("g.rectangle").each(function(d){
+    osteomyelitis_present_score = 0;
+    if (d.osteomyelitis_present_score)
+    {
+      osteomyelitis_present_score = d.osteomyelitis_present_score;
+    }
     if(d.annotation_type != "Osteomyelitis"){
       toe_number = "";
      }else{
@@ -586,6 +595,8 @@ function get_foot_rects(){
 		foot_rects.push({"x": d.x, "y": d.y, "width": d.width, "height": d.height,       
       "annotation_type":d.annotation_type,
       "toe_number": toe_number,
+      "osteomyelitis_present_score" : osteomyelitis_present_score
+
   });
 });
   
@@ -689,6 +700,22 @@ function open_diabetic_foot_modal(id){
     $("#__" + id["toe_number"]+">input").prop("checked", true);
 
     if(id["annotation_type"] == "Osteomyelitis"){
+        if(id["osteomyelitis_present_score"] >= 50){
+          d3.select("#osteo_present_label").classed("active", true);
+          $("#id_osteo_present").prop("checked", true);
+          $("#id_osteo_present").val(id["osteomyelitis_present_score"]);//set the value of the input to the current value
+
+
+        }
+        else //if osteo percentage is less than 50% then set the value to unchecked. 
+
+        {
+  d3.select("#osteo_present_label").classed("active", false);
+          $("#id_osteo_present").prop("checked", false);
+          $("#id_osteo_present").val(id["osteomyelitis_present_score"]);//set the value of the input to the current value
+        }
+
+
       //select the div element and show
       $("#id_bone_form").show();
       //otherwise hidehide
@@ -786,6 +813,39 @@ update();
 
 
 };
+//when the checkbox for osteo is selected, we put the osteo score for 100 for that rectangle
+$("#id_osteo_present").change(function(){
+  console.log("called - btn_clicked_foot_bone_osteo " + $('#id_osteo_present').is(":checked").toString());
+  // osteo_value = parseInt(original_value)
+  osteo_value =  0;
+
+  if ($('#id_osteo_present').is(":checked") == true){
+    osteo_value = 100;
+  }
+
+  
+  //Deactivates all of the bone_number buttons
+	d3.selectAll(".btn.btn-primary.annotation_button").classed("active", false);
+  //Activates only the button with the corresponding value
+  // d3.select("#__" + value).classed("active", true);
+
+
+  width = d3.select("rect.active").attr("width");
+	height = d3.select("rect.active").attr("height");
+  filtered_array = global_data_foot.filter(function(elems, i){
+    if(elems.width == width && elems.height == height){
+        //then that value exist in newEndPointDict
+
+        global_data_foot[i]["osteomyelitis_present_score"] = osteo_value;
+
+        // update();
+    
+     };//end if
+});//end of filter
+update();
+
+});
+
 
 $(document).ready(function(){
 

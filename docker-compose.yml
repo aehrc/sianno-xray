@@ -1,19 +1,28 @@
 version: '3'
 services:
 
+#migration service which runs on the same server, but runs the migration first 
+  migrate:
+    build: .
+    image: aehrc/sianno-migrate:1.0
 
-
+    command: bash -c "echo wokenup && /code/venv/bin/python manage.py makemigrations  --settings=simple_grader.settings_docker_vm && /code/venv/bin/python manage.py migrate  --settings=simple_grader.settings_docker_vm"
+    volumes:
+      - ./docker_volume:/code_volume
 
 #web service which runs the gunicorn service to run the django server.
 
   web:
     restart: always
     build: .
+    image: aehrc/sianno-web:1.0
     command: bash -c "/code/venv/bin/python manage.py runserver 0.0.0.0:8000 --settings=simple_grader.settings_docker_vm"
     volumes:
       - ./docker_volume:/code_volume
     ports:
       - "9000:8000"
+    depends_on:
+      - migrate
   
 
     

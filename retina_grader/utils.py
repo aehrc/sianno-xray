@@ -48,9 +48,11 @@ def save_foot_rect_info(doc, rect_info, scale):
 			annotation_type = item["annotation_type"],
 			toe_number = item["toe_number"],
 
+
 			# fracture_on_current_view= item["fracture_on_current_view"], 
 			# fracture_on_other_view= item["fracture_on_other_view"], 
 			# view_type = item["view_type"]
+			osteomyelitis_present_score = item["osteomyelitis_present_score"]/100
 			)
 
 		# toe_numbers = item["toe_number"].split(",")
@@ -297,9 +299,9 @@ def run_osteomyelitis_detection(document):
 
 	#  Run the Osteo Detection on the input folder.#################
 
-	DJANO_WORKING_DIRECTORY = "/Users/vig00a/code/sianno-xray-github/retina_grader"
-	if os.getenv('DJANO_WORKING_DIRECTORY'):
-		DJANO_WORKING_DIRECTORY = os.environ.get('DJANO_WORKING_DIRECTORY')
+	OSTEO_WORKING_DIRECTORY = "/Users/vig00a/code/sianno-xray-github/retina_grader"
+	if os.getenv('OSTEO_WORKING_DIRECTORY'):
+		OSTEO_WORKING_DIRECTORY = os.environ.get('OSTEO_WORKING_DIRECTORY')
 
 	subprocess.run([OSTEO_PYTHON_PATH, "run_osteo.py",
 				"--source",
@@ -307,7 +309,7 @@ def run_osteomyelitis_detection(document):
 					"--output_folder",
 				f"{results_rect_osteomyelitis_images}",
 				 ], 
-				 cwd=DJANO_WORKING_DIRECTORY) 
+				 cwd=OSTEO_WORKING_DIRECTORY) 
 
 	print("Ran the Osteo Detection ")
 
