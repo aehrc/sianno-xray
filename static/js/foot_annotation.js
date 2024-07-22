@@ -7,13 +7,16 @@
 var HANDLE_R = 5;
 var HANDLE_R_ACTIVE = 7;
 
-var MAP_HEIGHT = 2500;
+var MAP_HEIGHT = height;
+// var MAP_HEIGHT = 2500;
 var MAP_WIDTH = MAP_HEIGHT * Math.sqrt(2);
+
 
 var MAX_TRANSLATE_X = MAP_WIDTH / 2;
 var MIN_TRANSLATE_X = -MAX_TRANSLATE_X;
 
-var MAX_TRANSLATE_Y = MAP_HEIGHT / 2;
+// var MAX_TRANSLATE_Y = MAP_HEIGHT / 2;
+var MAX_TRANSLATE_Y = MAP_HEIGHT;
 var MIN_TRANSLATE_Y = -MAX_TRANSLATE_Y;
 
 var MIN_RECT_WIDTH = 10;
@@ -241,7 +244,7 @@ svg.on("dblclick.zoom", null);
 
 
 function resizerHover() {
-  // console.log("resizeHover");
+  console.log("resizeHover");
   var el = d3.select(this), isEntering = d3.event.type === "mouseenter";
   el.classed("hovering", isEntering)
     .attr(
@@ -252,7 +255,7 @@ function resizerHover() {
 }
 
   function rectResizeStartEnd() {
-    // console.log("rectResizeStartEnd");
+    console.log("rectResizeStartEnd");
     var el = d3.select(this), isStarting = d3.event.type === "start";
     d3.select(this)
       .classed("resizing", isStarting)
@@ -264,7 +267,7 @@ function resizerHover() {
   }
 
   function rectResizing(d) {
-    // console.log("rectResizing");
+    console.log("rectResizing");
     var dragX = Math.max(
       Math.min(d3.event.x, MAX_TRANSLATE_X),
       MIN_TRANSLATE_X
@@ -341,6 +344,9 @@ function update(){
     var newRects =
       rects.enter()
         .append("g")
+        .on('click', function(d) {
+          d3.select(this).raise();
+        } )
         .attr("visibility", function(d){
 
           //first check if the osteomyelitis_present_score_visualisation_enabled is true, if yes, then check for further keyboard togge. If not then display everything
@@ -582,7 +588,7 @@ function get_foot_rects(){
 
 	g_foot.selectAll("g.rectangle").each(function(d){
     osteomyelitis_present_score = 0;
-    if (d.osteomyelitis_present_score)
+    if ("osteomyelitis_present_score" in d)
     {
       osteomyelitis_present_score = d.osteomyelitis_present_score;
     }

@@ -24,9 +24,7 @@ import subprocess
 import csv
 import cv2
 
-#get the list of images from the database
-docs = Document.objects.filter(status="Draft").all()
-Document.objects.filter(status="Draft_Bone_Detected").delete()
+# Document.objects.filter(status="Draft_Bone_Detected").delete()
 
 
 #create a unique JOB ID for this run. 
@@ -160,7 +158,10 @@ def crop_resize_image(path_to_image, dcm_name,  y_max):
 
 #runs the full small and big bone detection 
 def run_small_big_bone_detection():
+	#get the list of images from the database
+	docs = Document.objects.filter(status="Draft").all()
 
+	Document.objects.filter(status="Draft_Bone_Detected").delete()
 
 
 	############# # Download the image to a temp file ####################################
